@@ -1,0 +1,106 @@
+{
+  "task_id": "otter/codex-linkpred",
+  "milestones": [
+    {
+      "id": "data-and-setup",
+      "name": "Data and Setup",
+      "description": "Load the CoDEx-M graph, report verifiable graph statistics, and save entity and relation embeddings for both models",
+      "type": "deterministic",
+      "critical": true,
+      "criteria": [
+        {
+          "id": "kg_stats_valid",
+          "description": "kg_stats.json entity, relation and triple counts match recomputation from the shipped files",
+          "weight": 1.5
+        },
+        {
+          "id": "embeddings_valid",
+          "description": "Entity and relation embedding matrices exist for both models with the right shapes, finite non-degenerate values, and matching dimensions",
+          "weight": 1.5
+        }
+      ]
+    },
+    {
+      "id": "model-development",
+      "name": "Model Development and Ranking",
+      "description": "Train TransE and a relation-aware GNN independently and rank every evaluation query from the trained parameters",
+      "type": "deterministic",
+      "critical": true,
+      "criteria": [
+        {
+          "id": "lp_predictions_complete",
+          "description": "Both ranking files cover every evaluation query exactly once with valid, non-repeating candidate lists",
+          "weight": 1.5
+        },
+        {
+          "id": "lp_rankings_match_embeddings",
+          "description": "Submitted rankings reproduce from the saved embeddings under a standard scoring rule",
+          "weight": 2.0
+        },
+        {
+          "id": "rgcn_encoder_reproduces",
+          "description": "The saved R-GCN input embeddings and per-relation transforms replay over the training graph to reproduce the saved rgcn embeddings, with transforms that genuinely differ by relation",
+          "weight": 2.0
+        },
+        {
+          "id": "models_differ",
+          "description": "The TransE and GNN rankings disagree often enough to be two independently trained models",
+          "weight": 1.0
+        },
+        {
+          "id": "lp_above_popularity",
+          "description": "Both models beat the popularity baseline on held-out queries",
+          "weight": 1.5
+        },
+        {
+          "id": "results_plausible",
+          "description": "Held-out link prediction results stay within the range this benchmark supports rather than indicating leaked answers",
+          "weight": 1.5
+        }
+      ]
+    },
+    {
+      "id": "evaluation-and-analysis",
+      "name": "Evaluation and Relation Analysis",
+      "description": "Verify every reported metric and relation-level conclusion against recomputation from the prediction files",
+      "type": "deterministic",
+      "critical": true,
+      "criteria": [
+        {
+          "id": "lp_results_honest",
+          "description": "lp_results.json overall and per-relation validation metrics match recomputation from the ranking files",
+          "weight": 1.5
+        },
+        {
+          "id": "relation_analysis_consistent",
+          "description": "relation_analysis.json per-relation metrics, hardest and easiest relations, and the frequency correlation verify against recomputation",
+          "weight": 2.5
+        },
+        {
+          "id": "metrics_selfreport_honest",
+          "description": "metrics.json matches recomputed validation values and model_config.json describes both models",
+          "weight": 1.5
+        }
+      ]
+    },
+    {
+      "id": "deliverables-and-report",
+      "name": "Deliverables and Report",
+      "description": "Written report meets quality standards. critical=false: failing this milestone costs rubric points but does not fail the task",
+      "type": "deterministic",
+      "critical": false,
+      "criteria": [
+        {
+          "id": "report_exists",
+          "description": "report.md exists with at least 300 words",
+          "weight": 0.5
+        },
+        {
+          "id": "report_content",
+          "description": "Report covers the models, the metrics, relation difficulty and caveats, and quotes the actual measured values",
+          "weight": 1.5
+        }
+      ]
+    }
+  ]
+}

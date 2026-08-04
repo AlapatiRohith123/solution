@@ -1,0 +1,13 @@
+line-length = 100
+
+# The harness files (tests/pass_fail.py, tests/rubric_score.py) are copied
+# verbatim from the skeleton and must stay byte-identical, so their lint
+# exemptions live here rather than as edits to the files themselves.
+# BLE001 is deliberately NOT listed: those files carry their own inline
+# `# noqa: BLE001`, and ignoring it here would make those directives unused.
+[lint.per-file-ignores]
+"solution/src/pipeline.py" = ["T201", "C901", "PLR0912", "PLR0913", "PLR0915", "PLR0917"]
+"tests/checks.py" = ["PLR2004", "C901", "PLR0912", "PLR0915"]
+"tests/pass_fail.py" = ["F401", "I001", "RUF005", "PERF401", "W292", "E501", "EXE001", "PLR2004", "PLR0912", "C901", "T201"]
+"tests/rubric_score.py" = ["F401", "I001", "RUF005", "PERF401", "W292", "E501", "EXE001", "PLR2004", "PLR0912", "C901", "T201"]
+"tests/evaluate.py" = ["I001"]

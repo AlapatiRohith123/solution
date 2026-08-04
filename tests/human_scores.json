@@ -1,0 +1,21 @@
+{
+  "task_id": "otter/codex-linkpred",
+  "pass_criteria": {
+    "transe_mrr": 0.21,
+    "rgcn_mrr": 0.085,
+    "transe_hits10": 0.35
+  },
+  "attempts": [
+    {
+      "id": "knowledge_graph_link_prediction",
+      "architecture": "PairwiseTranslationKGE (TransE with L2 distance, entity sphere projection) and RelationalGCN (3-layer R-GCN with 4-basis decomposition and per-layer bias, DistMult decoder)",
+      "augmentations": "Pairwise margin hinge loss with margin 1.0, 48 negatives per positive (head and tail corruption), 20% edge dropout in R-GCN encoder, entity L2 normalisation after each TransE gradient step, gradient clipping (max norm 5.0)",
+      "description": "TransE: AdamW (lr=1e-3, weight_decay=1e-4) with cosine LR annealing (eta_min=lr/100), 150 epochs, batch 4096, L2 scoring. R-GCN: SGD with momentum=0.9 and linear LR warmup over 10 epochs, 200 epochs, L1 embedding regularisation, 3 propagation layers, 4 shared basis matrices, per-layer bias, Kaiming-normal initialisation.",
+      "metrics": {
+        "transe_mrr": 0.25496172538134493,
+        "rgcn_mrr": 0.11852658621093712,
+        "transe_hits10": 0.4282250242483026
+      }
+    }
+  ]
+}
