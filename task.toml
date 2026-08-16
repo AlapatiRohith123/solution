@@ -1,0 +1,37 @@
+schema_version = "1.3"
+runtime_limits = 9000
+
+[task]
+name = "otter/ppgn-revised-qm9-regression"
+description = "Train and ablate a CUDA order-2 Provably Powerful Graph Network on a frozen Revised-QM9 molecular regression split, then verify permutation invariance and beyond-1-WL expressivity."
+
+[metadata]
+domain = "graph-learning"
+subdomain = "graph-regression"
+tags = ["pytorch", "ppgn", "molecular-graphs", "qm9", "graph-expressivity"]
+source_dataset = "Revised QM9 deterministic 36,000-molecule subset"
+source_url = "https://figshare.com/articles/dataset/Revised_QM9_dataset/25266574"
+source_reference_id = "10.6084/m9.figshare.25266574"
+source_license = "CC BY 4.0"
+
+[metadata.network]
+enabled = true
+policy = "internet_allowed_with_blacklist"
+blacklist_file = "network_blacklist.txt"
+
+[environment]
+build_timeout_sec = 1200.0
+workdir = "/app"
+os = "linux"
+cpus = 8
+memory_mb = 32768
+storage_mb = 20480
+gpus = 1
+gpu_types = ["L4"]
+allow_internet = true
+
+[agent]
+timeout_sec = 9000.0
+
+[verifier]
+timeout_sec = 900.0

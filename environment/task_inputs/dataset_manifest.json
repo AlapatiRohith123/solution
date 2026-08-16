@@ -1,0 +1,57 @@
+{
+  "allowed_atomic_numbers": [
+    1,
+    6,
+    7,
+    8,
+    9
+  ],
+  "bond_rule": {
+    "covalent_radii_angstrom": {
+      "1": 0.31,
+      "6": 0.76,
+      "7": 0.71,
+      "8": 0.66,
+      "9": 0.57
+    },
+    "description": "Undirected bond when distance <= 1.25 times the sum of the two covalent radii; self-pairs and padded atoms excluded.",
+    "multiplier": 1.25
+  },
+  "dataset": "Revised QM9 deterministic Otter subset",
+  "maximum_atoms": 29,
+  "selection_seed": 1912019,
+  "source_doi": "10.6084/m9.figshare.25266574",
+  "source_license": "CC BY 4.0",
+  "source_sha256": "ae462069384755ddd0c403f5aa39844a83e426424a92576c78076b3e5dae6fdb",
+  "source_url": "https://figshare.com/articles/dataset/Revised_QM9_dataset/25266574",
+  "split_sizes": {
+    "test": 3000,
+    "train": 30000,
+    "valid": 3000
+  },
+  "target_mean": [
+    -2.919052310565114,
+    -0.2974950882007678,
+    0.02642647715256635,
+    2.87528056815462
+  ],
+  "target_names": [
+    "atomization",
+    "homo",
+    "lumo",
+    "dipole"
+  ],
+  "target_std": [
+    0.4169121544779931,
+    0.02255290545516925,
+    0.037936634031025186,
+    1.600054602728895
+  ],
+  "target_units": [
+    "hartree",
+    "hartree",
+    "hartree",
+    "debye"
+  ],
+  "version": "1.0"
+}

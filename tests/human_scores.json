@@ -1,0 +1,60 @@
+{
+  "task_id": "otter/ppgn-revised-qm9-regression",
+  "pass_criteria": {
+    "hidden_mean_standardized_mae": {
+      "threshold": 0.45,
+      "comparison": "lte"
+    },
+    "hidden_atomization_mae": {
+      "threshold": 0.12,
+      "comparison": "lte"
+    },
+    "hidden_homo_mae": {
+      "threshold": 0.012,
+      "comparison": "lte"
+    },
+    "hidden_lumo_mae": {
+      "threshold": 0.02,
+      "comparison": "lte"
+    },
+    "hidden_dipole_mae": {
+      "threshold": 0.85,
+      "comparison": "lte"
+    },
+    "quadratic_validation_gain": {
+      "threshold": 0.05,
+      "comparison": "gte"
+    },
+    "hidden_expressivity_accuracy": {
+      "threshold": 0.95,
+      "comparison": "gte"
+    },
+    "hidden_expressivity_gap": {
+      "threshold": 0.3,
+      "comparison": "gte"
+    },
+    "permutation_max_delta": {
+      "threshold": 0.0002,
+      "comparison": "lte"
+    }
+  },
+  "attempts": [
+    {
+      "id": "human_reference_fair_budget_1",
+      "architecture": "59,812-parameter order-2 molecular PPGN with learned feature-channel matrix products, invariant graph pooling, and four standardized regression heads.",
+      "augmentations": "Deterministic distance-derived molecular graphs, target standardization, quadratic-free ablation, and permutation-augmented C6-versus-two-triangles expressivity training.",
+      "description": "Reference pipeline trained both molecular regressors for 30 epochs on one Modal L4 during Harbor oracle job ppgn-qm9-oracle-v7; all nine task-specific criteria, all primary metrics, and all critical milestones passed with Binary Grade 1, reward 1.0, and rubric 1.0.",
+      "metrics": {
+        "hidden_mean_standardized_mae": 0.12563105126879237,
+        "hidden_atomization_mae": 0.01497129003206889,
+        "hidden_homo_mae": 0.004320059498151144,
+        "hidden_lumo_mae": 0.004378452974786342,
+        "hidden_dipole_mae": 0.25544411677978135,
+        "quadratic_validation_gain": 0.2079606395494359,
+        "hidden_expressivity_accuracy": 1.0,
+        "hidden_expressivity_gap": 0.5,
+        "permutation_max_delta": 0.0000011920928955078125
+      }
+    }
+  ]
+}

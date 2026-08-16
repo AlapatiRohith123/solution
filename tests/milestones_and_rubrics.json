@@ -1,0 +1,77 @@
+{
+  "task_id": "otter/ppgn-revised-qm9-regression",
+  "milestones": [
+    {
+      "id": "frozen-data-and-regeneration",
+      "name": "Frozen Data and Artifact Integrity",
+      "description": "Preserve the licensed fixed split and independently validate every required artifact while retaining the executable entrypoint contract.",
+      "type": "deterministic",
+      "critical": true,
+      "criteria": [
+        {
+          "id": "data-integrity",
+          "description": "Frozen split hashes, schemas, sizes, IDs, labels, and provenance are intact and disjoint.",
+          "weight": 2.0
+        },
+        {
+          "id": "entrypoint-contract",
+          "description": "A regular /app/run.py entrypoint is present in the fresh task environment and the independently checked artifact set is complete.",
+          "weight": 1.0
+        },
+        {
+          "id": "required-artifacts",
+          "description": "Every required checkpoint, TorchScript export, prediction, metric, history, GPU-evidence, and report artifact exists and is nonempty.",
+          "weight": 1.5
+        }
+      ]
+    },
+    {
+      "id": "ppgn-model-and-hidden-evaluation",
+      "name": "PPGN Model and Hidden Evaluation",
+      "description": "Produce a real order-2 PPGN, valid frozen-split predictions, independently recomputable metrics, and invariant executable exports.",
+      "type": "deterministic",
+      "critical": true,
+      "criteria": [
+        {
+          "id": "model-checkpoint",
+          "description": "The checkpoint is loadable, finite, nontrivial, semantically identifies an order-2 PPGN with a quadratic matrix product, and records CUDA training.",
+          "weight": 2.0
+        },
+        {
+          "id": "ablation-model",
+          "description": "The quadratic-free ablation checkpoint is loadable, finite, nontrivial, records the same 7,050-step CUDA budget, and is identified as order-2 without a matrix product.",
+          "weight": 1.5
+        },
+        {
+          "id": "prediction-and-metric-integrity",
+          "description": "Primary and ablation predictions exactly cover their frozen splits and every reported validation metric matches an independent recomputation.",
+          "weight": 2.5
+        },
+        {
+          "id": "torchscript-and-invariance",
+          "description": "CUDA TorchScript replay matches saved hidden-test predictions, remains permutation invariant, and independently reproduces both expressivity classifiers.",
+          "weight": 2.5
+        },
+        {
+          "id": "gpu-execution",
+          "description": "GPU evidence records exactly one CUDA device, positive optimizer steps for every experiment, positive peak CUDA allocation, and elapsed runtime.",
+          "weight": 1.5
+        }
+      ]
+    },
+    {
+      "id": "analysis-and-reproducibility",
+      "name": "Analysis and Reproducibility",
+      "description": "Explain the licensed data, PPGN design, ablation, expressivity result, CUDA execution, quadratic cost, and limitations.",
+      "type": "deterministic",
+      "critical": false,
+      "criteria": [
+        {
+          "id": "report-content",
+          "description": "The report is substantive and covers every required provenance, method, result, reproducibility, compute, and limitation topic.",
+          "weight": 2.0
+        }
+      ]
+    }
+  ]
+}
