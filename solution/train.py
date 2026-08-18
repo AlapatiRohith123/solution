@@ -16,7 +16,7 @@ class SequenceCNN(nn.Module):
         
     def forward(self, x):
         # x is (batch_size, 72)
-        x = self.embedding(x)
+        x = self.embedding(x.long())
         x = x.transpose(1, 2) # (batch_size, 16, 72)
         
         c3 = F.relu(self.conv3(x)) # (batch_size, 64, 72)
