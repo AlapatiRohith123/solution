@@ -24,3 +24,14 @@ def convert(trainer, output_path: Path) -> None:
         opset_version=17,
         do_constant_folding=True
     )
+    
+    # Inline any external data created by newer PyTorch exporters
+    import onnx
+    import os
+    if os.path.exists(str(output_path)):
+        model = onnx.load(str(output_path), load_external_data=True)
+        onnx.save_model(model, str(output_path), save_as_external_data=False)
+        # Remove the external data file if it exists to keep directory clean
+        ext_data_path = str(output_path) + ".data"
+        if os.path.exists(ext_data_path):
+            os.remove(ext_data_path)
