@@ -18,5 +18,5 @@ mkdir -p "${output}"
 python3 "${app_dir}/run_training.py" \
     "${app_dir}/data/shakespeare.npz" \
     "${output}" \
-    --train-steps 100000 > /kaggle/working/logs/training.log 2>&1
+    --train-steps 10000 > /kaggle/working/logs/training.log 2>&1
 cp "${output}/model.onnx" "${app_dir}/model.onnx"
