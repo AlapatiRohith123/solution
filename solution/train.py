@@ -36,7 +36,8 @@ class SequenceCNN(nn.Module):
 
 class Trainer:
     def __init__(self, num_labels: int, train_steps: int):
-        self.model = SequenceCNN(num_labels)
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.model = SequenceCNN(num_labels).to(self.device)
         self.optimizer = optim.Adam(self.model.parameters(), lr=2e-3)
         self.criterion = nn.CrossEntropyLoss()
         self.train_steps = train_steps
@@ -45,7 +46,8 @@ class Trainer:
         self.model.train()
         self.optimizer.zero_grad()
         
-        samples = samples.to(torch.int64)
+        samples = samples.to(self.device).to(torch.int64)
+        labels = labels.to(self.device)
         logits = self.model(samples)
         
         loss = self.criterion(logits, labels)
@@ -57,6 +59,6 @@ class Trainer:
     def predict(self, samples: torch.Tensor) -> torch.Tensor:
         self.model.eval()
         with torch.no_grad():
-            samples = samples.to(torch.int64)
+            samples = samples.to(self.device).to(torch.int64)
             logits = self.model(samples)
             return logits
