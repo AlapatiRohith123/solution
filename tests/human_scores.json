@@ -1,0 +1,32 @@
+{
+  "task_id": "otter/play-dialogue-classifier",
+  "pass_criteria": {
+    "canary_macro_ap_ratio": 10.0,
+    "fast_macro_ap_ratio": 4.5,
+    "full_macro_ap_ratio": 5.0,
+    "ibsen_macro_ap_ratio": 4.5,
+    "reproduction_probability_rmse": {
+      "comparison": "lte",
+      "threshold": 0.1
+    },
+    "reversed_macro_ap_ratio": 4.5,
+    "submitted_macro_ap_ratio": 5.0
+  },
+  "attempts": [
+    {
+      "id": "human_1",
+      "architecture": "Printable-byte embeddings feed parallel width-3 and width-5 convolutions with max-mean pooling.",
+      "augmentations": "None.",
+      "description": "L4 Harbor runs covered the 100,000-step Shakespeare trials and Ibsen robustness.",
+      "metrics": {
+        "canary_macro_ap_ratio": 28.0,
+        "fast_macro_ap_ratio": 4.894068726653471,
+        "full_macro_ap_ratio": 5.272417793470698,
+        "ibsen_macro_ap_ratio": 7.014080197624073,
+        "reproduction_probability_rmse": 0.037368972834103384,
+        "reversed_macro_ap_ratio": 4.8038736807815425,
+        "submitted_macro_ap_ratio": 5.175689710790608
+      }
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+# Public sources that reproduce the bundled play corpora.
+gutenberg.org
+www.gutenberg.org
+shakespeare.mit.edu
+folgerdigitaltexts.org
+shakespeare.folger.edu
+ibsen.uio.no
+ibsenstage.hf.uio.no
+archive.org
+en.wikisource.org

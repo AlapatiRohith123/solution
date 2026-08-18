@@ -1,0 +1,62 @@
+{
+  "task_id": "otter/play-dialogue-classifier",
+  "milestones": [
+    {
+      "id": "trainer-delivery",
+      "name": "Trainer Delivery",
+      "description": "Ship the trainer and converter through every changed step-bounded run.",
+      "type": "deterministic",
+      "critical": true,
+      "criteria": [
+        {
+          "id": "deliverable-files",
+          "description": "The trainer, converter, and final model exist.",
+          "weight": 0.5
+        },
+        {
+          "id": "step-runs",
+          "description": "Every configured retraining trial completes, including the public-domain robustness corpus.",
+          "weight": 1.0
+        },
+        {
+          "id": "converter-outputs",
+          "description": "Every exported interval is valid standard ONNX and changes predictions.",
+          "weight": 1.0
+        }
+      ]
+    },
+    {
+      "id": "training-behavior",
+      "name": "Training Behavior",
+      "description": "Demonstrate genuine updates and cross-playwright behavior.",
+      "type": "deterministic",
+      "critical": true,
+      "criteria": [
+        {
+          "id": "anti-cheat-runs",
+          "description": "Changed-label, pure-canary, and Ibsen trials learn their supplied tasks.",
+          "weight": 1.5
+        },
+        {
+          "id": "parameter-updates",
+          "description": "Every step-budget interval changes model parameters.",
+          "weight": 1.5
+        }
+      ]
+    },
+    {
+      "id": "model-delivery",
+      "name": "Model Delivery",
+      "description": "Validate the submitted final model and its required file.",
+      "type": "deterministic",
+      "critical": true,
+      "criteria": [
+        {
+          "id": "submitted-model",
+          "description": "The submitted model is bounded and executable.",
+          "weight": 1.0
+        }
+      ]
+    }
+  ]
+}

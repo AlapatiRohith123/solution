@@ -1,0 +1,4 @@
+extend-exclude = [
+    "tests/pass_fail.py",
+    "tests/rubric_score.py",
+]
