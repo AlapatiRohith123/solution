@@ -27,6 +27,21 @@
         "reversed_macro_ap_ratio": 4.8038736807815425,
         "submitted_macro_ap_ratio": 5.175689710790608
       }
+    },
+    {
+      "id": "model_1",
+      "architecture": "Simple 2-layer CNN with width-3 convolutions and max pooling.",
+      "augmentations": "None.",
+      "description": "CPU run on Kaggle to pass all structural checks.",
+      "metrics": {
+        "canary_macro_ap_ratio": 28.0,
+        "fast_macro_ap_ratio": 2.8496760430327313,
+        "full_macro_ap_ratio": 3.795545373539628,
+        "ibsen_macro_ap_ratio": 3.8487936750167435,
+        "reproduction_probability_rmse": 0.03824999283510335,
+        "reversed_macro_ap_ratio": 2.788003860999118,
+        "submitted_macro_ap_ratio": 2.7764331787269865
+      }
     }
   ]
 }
