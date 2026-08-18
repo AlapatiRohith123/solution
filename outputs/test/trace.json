@@ -1,0 +1,50 @@
+{
+  "num_labels": 28,
+  "states": [
+    {
+      "checkpoint": "checkpoint_000.onnx",
+      "elapsed_seconds": 0.0,
+      "examples": 0,
+      "loss": null,
+      "model_bytes": 14901,
+      "parameter_sha256": "173f28ed989b3f7d53cf991b969e46eddde1873a9451b9bcbfba1b5ee572a6ec",
+      "steps": 0
+    },
+    {
+      "checkpoint": "checkpoint_001.onnx",
+      "elapsed_seconds": 0.07862719999684487,
+      "examples": 768,
+      "loss": 3.335517406463623,
+      "model_bytes": 14901,
+      "parameter_sha256": "e5a00ae77b5375384c536e0fc7cf4dd311375c7a9b6f5e872ae0de5ced6251a2",
+      "steps": 3
+    },
+    {
+      "checkpoint": "checkpoint_002.onnx",
+      "elapsed_seconds": 1.2155210999917472,
+      "examples": 1280,
+      "loss": 3.3287858963012695,
+      "model_bytes": 14901,
+      "parameter_sha256": "b8350b26c272f0e7faf89558ae0227df0452fc7ea58009ff55c54c1b7d8a6a72",
+      "steps": 5
+    },
+    {
+      "checkpoint": "checkpoint_003.onnx",
+      "elapsed_seconds": 2.451996499992674,
+      "examples": 2048,
+      "loss": 3.318298816680908,
+      "model_bytes": 14901,
+      "parameter_sha256": "eafef009c18bb45bcd6fc5b8bed0a4eeacd10f70972061f38ff435aae3fdfabb",
+      "steps": 8
+    },
+    {
+      "checkpoint": "checkpoint_004.onnx",
+      "elapsed_seconds": 4.88788549999299,
+      "examples": 2560,
+      "loss": 3.3292624950408936,
+      "model_bytes": 14901,
+      "parameter_sha256": "cf05b9f1b332abd59b9c0b1862a2c125f9c6b987271810827b93e6ef3464118c",
+      "steps": 10
+    }
+  ]
+}
