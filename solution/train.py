@@ -6,12 +6,12 @@ import torch.optim as optim
 class SequenceCNN(nn.Module):
     def __init__(self, num_labels: int):
         super().__init__()
-        self.embedding = nn.Embedding(256, 16)
+        self.embedding = nn.Embedding(256, 24)
         
-        self.conv3 = nn.Conv1d(16, 44, kernel_size=3, padding=1)
-        self.conv5 = nn.Conv1d(16, 44, kernel_size=5, padding=2)
+        self.conv3 = nn.Conv1d(24, 32, kernel_size=3, padding=1)
+        self.conv5 = nn.Conv1d(24, 32, kernel_size=5, padding=2)
         
-        self.fc = nn.Linear(176, num_labels)
+        self.fc = nn.Linear(128, num_labels)
         
     def forward(self, x):
         # x is (batch_size, 72)
@@ -34,12 +34,31 @@ class Trainer:
     def __init__(self, num_labels: int, train_steps: int):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model = SequenceCNN(num_labels).to(self.device)
-        self.optimizer = optim.Adam(self.model.parameters(), lr=2e-3)
+        self.train_steps = max(int(train_steps), 1)
+        self.completed_steps = 0
+        
+        self.base_lr = 0.015
+        self.warmup_fraction = 0.1
+        self.optimizer = optim.AdamW(
+            self.model.parameters(), 
+            lr=self.base_lr,
+            weight_decay=0.03
+        )
         self.criterion = nn.CrossEntropyLoss()
-        self.train_steps = train_steps
+        
+    def _update_lr(self) -> None:
+        progress = min(self.completed_steps / self.train_steps, 1.0)
+        if progress < self.warmup_fraction:
+            scale = progress / self.warmup_fraction
+        else:
+            scale = (1.0 - progress) / (1.0 - self.warmup_fraction)
+        
+        for param_group in self.optimizer.param_groups:
+            param_group["lr"] = self.base_lr * max(scale, 0.0)
 
     def step(self, samples: torch.Tensor, labels: torch.Tensor) -> float:
         self.model.train()
+        self._update_lr()
         self.optimizer.zero_grad()
         
         samples = samples.to(self.device).to(torch.int64)
@@ -48,8 +67,10 @@ class Trainer:
         
         loss = self.criterion(logits, labels)
         loss.backward()
+        nn.utils.clip_grad_norm_(self.model.parameters(), 3.0)
         self.optimizer.step()
         
+        self.completed_steps += 1
         return loss.item()
 
     def predict(self, samples: torch.Tensor) -> torch.Tensor:
