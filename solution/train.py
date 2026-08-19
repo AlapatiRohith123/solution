@@ -9,10 +9,10 @@ class SequenceCNN(nn.Module):
         self.embedding = nn.Embedding(256, 16)
         
         # Parallel convolutions
-        self.conv3 = nn.Conv1d(16, 64, kernel_size=3, padding=1)
-        self.conv5 = nn.Conv1d(16, 64, kernel_size=5, padding=2)
+        self.conv3 = nn.Conv1d(16, 48, kernel_size=3, padding=1)
+        self.conv5 = nn.Conv1d(16, 48, kernel_size=5, padding=2)
         
-        self.fc = nn.Linear(128, num_labels)
+        self.fc = nn.Linear(96, num_labels)
         
     def forward(self, x):
         # x is (batch_size, 72)
