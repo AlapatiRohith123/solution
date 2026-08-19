@@ -6,18 +6,18 @@ import torch.optim as optim
 class SequenceCNN(nn.Module):
     def __init__(self, num_labels: int):
         super().__init__()
-        self.embedding = nn.Embedding(256, 16)
+        self.embedding = nn.Embedding(256, 8)
         
         # Parallel convolutions
-        self.conv3 = nn.Conv1d(16, 48, kernel_size=3, padding=1)
-        self.conv5 = nn.Conv1d(16, 48, kernel_size=5, padding=2)
+        self.conv3 = nn.Conv1d(8, 64, kernel_size=3, padding=1)
+        self.conv5 = nn.Conv1d(8, 64, kernel_size=5, padding=2)
         
-        self.fc = nn.Linear(96, num_labels)
+        self.fc = nn.Linear(128, num_labels)
         
     def forward(self, x):
         # x is (batch_size, 72)
         x = self.embedding(x.long())
-        x = x.transpose(1, 2) # (batch_size, 16, 72)
+        x = x.transpose(1, 2) # (batch_size, 8, 72)
         
         c3 = F.relu(self.conv3(x)) # (batch_size, 64, 72)
         c5 = F.relu(self.conv5(x)) # (batch_size, 64, 72)
