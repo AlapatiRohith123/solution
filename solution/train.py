@@ -8,10 +8,10 @@ class SequenceCNN(nn.Module):
         super().__init__()
         self.embedding = nn.Embedding(256, 24)
         
-        self.conv3 = nn.Conv1d(24, 28, kernel_size=3, padding=1)
-        self.conv5 = nn.Conv1d(24, 28, kernel_size=5, padding=2)
+        self.conv3 = nn.Conv1d(24, 30, kernel_size=3, padding=1)
+        self.conv5 = nn.Conv1d(24, 30, kernel_size=5, padding=2)
         
-        self.fc = nn.Linear(112, num_labels)
+        self.fc = nn.Linear(120, num_labels)
         
     def forward(self, x):
         # x is (batch_size, 72)
@@ -37,12 +37,12 @@ class Trainer:
         self.train_steps = max(int(train_steps), 1)
         self.completed_steps = 0
         
-        self.base_lr = 0.015
+        self.base_lr = 0.01
         self.warmup_fraction = 0.1
         self.optimizer = optim.AdamW(
             self.model.parameters(), 
             lr=self.base_lr,
-            weight_decay=0.03
+            weight_decay=0.01
         )
         self.criterion = nn.CrossEntropyLoss()
         
