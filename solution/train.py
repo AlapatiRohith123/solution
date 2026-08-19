@@ -8,10 +8,10 @@ class SequenceCNN(nn.Module):
         super().__init__()
         self.embedding = nn.Embedding(256, 24)
         
-        self.conv3 = nn.Conv1d(24, 32, kernel_size=3, padding=1)
-        self.conv5 = nn.Conv1d(24, 32, kernel_size=5, padding=2)
+        self.conv3 = nn.Conv1d(24, 28, kernel_size=3, padding=1)
+        self.conv5 = nn.Conv1d(24, 28, kernel_size=5, padding=2)
         
-        self.fc = nn.Linear(128, num_labels)
+        self.fc = nn.Linear(112, num_labels)
         
     def forward(self, x):
         # x is (batch_size, 72)
