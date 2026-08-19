@@ -30,17 +30,17 @@
     },
     {
       "id": "model_1",
-      "architecture": "Simple 2-layer CNN with width-3 convolutions and max pooling.",
+      "architecture": "Printable-byte embeddings feed parallel width-3 and width-5 convolutions with max-mean pooling.",
       "augmentations": "None.",
-      "description": "CPU run on Kaggle to pass all structural checks.",
+      "description": "Final optimized parallel CNN architecture evaluated on T4 Kaggle GPU.",
       "metrics": {
         "canary_macro_ap_ratio": 28.0,
-        "fast_macro_ap_ratio": 2.8496760430327313,
-        "full_macro_ap_ratio": 3.795545373539628,
-        "ibsen_macro_ap_ratio": 3.8487936750167435,
-        "reproduction_probability_rmse": 0.03824999283510335,
-        "reversed_macro_ap_ratio": 2.788003860999118,
-        "submitted_macro_ap_ratio": 2.7764331787269865
+        "fast_macro_ap_ratio": 4.826405885610226,
+        "full_macro_ap_ratio": 5.067438102987349,
+        "ibsen_macro_ap_ratio": 6.374548307049146,
+        "reproduction_probability_rmse": 0.045510903318350136,
+        "reversed_macro_ap_ratio": 4.7794159957726485,
+        "submitted_macro_ap_ratio": 5.008926348938581
       }
     }
   ]
