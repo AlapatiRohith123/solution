@@ -22,10 +22,10 @@ class SequenceCNN(nn.Module):
         c3 = F.relu(self.conv3(x)) # (batch_size, 64, 72)
         c5 = F.relu(self.conv5(x)) # (batch_size, 64, 72)
         
-        c3_max = F.adaptive_max_pool1d(c3, 1).squeeze(-1)
-        c3_mean = F.adaptive_avg_pool1d(c3, 1).squeeze(-1)
-        c5_max = F.adaptive_max_pool1d(c5, 1).squeeze(-1)
-        c5_mean = F.adaptive_avg_pool1d(c5, 1).squeeze(-1)
+        c3_max = F.max_pool1d(c3, c3.size(2)).squeeze(-1)
+        c3_mean = F.avg_pool1d(c3, c3.size(2)).squeeze(-1)
+        c5_max = F.max_pool1d(c5, c5.size(2)).squeeze(-1)
+        c5_mean = F.avg_pool1d(c5, c5.size(2)).squeeze(-1)
         
         c3_pool = c3_max + c3_mean
         c5_pool = c5_max + c5_mean
