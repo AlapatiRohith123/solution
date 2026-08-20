@@ -14,9 +14,8 @@ class SequenceCNN(nn.Module):
         self.fc = nn.Linear(120, num_labels)
         
     def forward(self, x):
-        # x is (batch_size, 72)
         x = self.embedding(x.long())
-        x = x.transpose(1, 2) # (batch_size, 16, 72)
+        x = x.transpose(1, 2) 
         
         c3 = F.relu(self.conv3(x))
         c5 = F.relu(self.conv5(x))
