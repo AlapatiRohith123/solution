@@ -1,0 +1,10 @@
+coloredlogs
+flatbuffers
+humanfriendly
+numpy
+onnx
+onnxruntime
+onnxscript
+packaging
+protobuf
+sympy
