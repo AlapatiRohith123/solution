@@ -2,19 +2,16 @@
   "task_id": "otter/opssat-ad",
   "pass_criteria": {
     "mcc": {
-      "threshold": 0.60,
-      "comparison": "gte",
-      "pass_rate": 0.5
+      "threshold": 0.6,
+      "comparison": "gte"
     },
     "auc_pr": {
       "threshold": 0.75,
-      "comparison": "gte",
-      "pass_rate": 0.5
+      "comparison": "gte"
     },
     "worst_channel_f1": {
       "threshold": 0.45,
-      "comparison": "gte",
-      "pass_rate": 0.5
+      "comparison": "gte"
     }
   },
   "attempts": [

@@ -1,50 +1,51 @@
 {
   "milestones": [
     {
-      "milestone_id": "model_artifacts",
       "description": "Model and inference script created",
       "critical": true,
       "criteria": [
         {
-          "criterion_id": "inference_exists",
           "description": "Inference script exists",
-          "weight": 0.5
+          "weight": 0.5,
+          "id": "inference_exists"
         },
         {
-          "criterion_id": "metrics_json_exists",
           "description": "Metrics JSON exists",
-          "weight": 0.5
+          "weight": 0.5,
+          "id": "metrics_json_exists"
         }
-      ]
+      ],
+      "id": "model_artifacts"
     },
     {
-      "milestone_id": "inference_evaluation",
       "description": "Inference runs on hidden set and evaluates",
       "critical": true,
       "criteria": [
         {
-          "criterion_id": "inference_runs",
           "description": "Inference executes without crashing",
-          "weight": 0.5
+          "weight": 0.5,
+          "id": "inference_runs"
         },
         {
-          "criterion_id": "performance_measured",
           "description": "Performance metrics calculated",
-          "weight": 0.5
+          "weight": 0.5,
+          "id": "performance_measured"
         }
-      ]
+      ],
+      "id": "inference_evaluation"
     },
     {
-      "milestone_id": "pass_fail",
       "description": "Final task pass/fail status",
       "critical": false,
       "criteria": [
         {
-          "criterion_id": "pass_fail",
           "description": "Passed all criteria and thresholds",
-          "weight": 1.0
+          "weight": 1.0,
+          "id": "pass_fail"
         }
-      ]
+      ],
+      "id": "pass_fail",
+      "type": "final_pass_fail"
     }
   ]
 }

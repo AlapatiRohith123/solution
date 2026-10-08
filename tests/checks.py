@@ -9,12 +9,13 @@ def evaluate(context=None):
     results = {}
     app_dir = os.environ.get("APP_DIR", "/app")
 
-    metrics = {}
+    metrics = {"mcc": 0.0, "auc_pr": 0.0, "worst_channel_f1": 0.0}
     
     # Check if artifacts exist
     if not os.path.exists(f"{app_dir}/artifacts/inference.py"):
         results['inference_exists'] = False
-        return {'criteria': results, 'metrics': metrics}
+        return _pack_results(results, metrics)
+        
     results['inference_exists'] = True
     
     if not os.path.exists(f"{app_dir}/artifacts/metrics.json"):
@@ -28,7 +29,7 @@ def evaluate(context=None):
         results['inference_runs'] = True
     except Exception:  # noqa: BLE001
         results['inference_runs'] = False
-        return {'criteria': results, 'metrics': metrics}
+        return _pack_results(results, metrics)
         
     # Evaluate predictions
     try:
@@ -57,4 +58,14 @@ def evaluate(context=None):
     except Exception:  # noqa: BLE001
         results['performance_measured'] = False
         
-    return {'criteria': results, 'metrics': metrics}
+    return _pack_results(results, metrics)
+
+
+def _pack_results(results, metrics):
+    criteria_list = [
+        {"id": "inference_exists", "passed": results.get("inference_exists", False)},
+        {"id": "metrics_json_exists", "passed": results.get("metrics_json_exists", False)},
+        {"id": "inference_runs", "passed": results.get("inference_runs", False)},
+        {"id": "performance_measured", "passed": results.get("performance_measured", False)}
+    ]
+    return {'criteria': criteria_list, 'metrics': metrics}
