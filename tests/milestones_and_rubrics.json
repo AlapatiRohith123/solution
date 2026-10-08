@@ -33,6 +33,18 @@
           "weight": 0.5
         }
       ]
+    },
+    {
+      "milestone_id": "pass_fail",
+      "description": "Final task pass/fail status",
+      "critical": false,
+      "criteria": [
+        {
+          "criterion_id": "pass_fail",
+          "description": "Passed all criteria and thresholds",
+          "weight": 1.0
+        }
+      ]
     }
   ]
 }

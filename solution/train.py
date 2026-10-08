@@ -1,16 +1,17 @@
-import pandas as pd
-import numpy as np
 import json
 import os
+
+import numpy as np
+import pandas as pd
 import torch
-import torch.nn as nn
-import torch.optim as optim
+from sklearn.metrics import average_precision_score, f1_score, matthews_corrcoef
+from torch import nn, optim
 from torch.utils.data import DataLoader, TensorDataset
-from sklearn.metrics import matthews_corrcoef, average_precision_score, f1_score
+
 
 class TabularNN(nn.Module):
     def __init__(self, input_dim):
-        super(TabularNN, self).__init__()
+        super().__init__()
         self.fc1 = nn.Linear(input_dim, 256)
         self.relu1 = nn.ReLU()
         self.drop1 = nn.Dropout(0.2)
@@ -30,8 +31,9 @@ def main():
     torch.manual_seed(42)
     np.random.seed(42)
     
+    app_dir = os.environ.get("APP_DIR", "/app")
     # Load dataset
-    df = pd.read_csv('/app/task_inputs/dataset.csv')
+    df = pd.read_csv(f"{app_dir}/task_inputs/dataset.csv")
     
     # Train on labelled data only for simplicity in the oracle
     labeled_df = df[df['anomaly'] != -1].copy()
@@ -71,11 +73,11 @@ def main():
             optimizer.step()
             
     # Save model
-    os.makedirs('/app/artifacts', exist_ok=True)
+    os.makedirs(f"{app_dir}/artifacts", exist_ok=True)
     
     # If DataParallel was used, save the underlying module
     model_to_save = model.module if isinstance(model, nn.DataParallel) else model
-    torch.save(model_to_save.state_dict(), '/app/artifacts/model.pth')
+    torch.save(model_to_save.state_dict(), f"{app_dir}/artifacts/model.pth")
         
     # Generate inference script
     inference_code = """
@@ -107,14 +109,15 @@ parser.add_argument('--input', required=True)
 parser.add_argument('--output', required=True)
 args = parser.parse_args()
 
-df = pd.read_csv(args.input)
+app_dir = os.environ.get("APP_DIR", "/app")
+    df = pd.read_csv(args.input)
 features = ['duration', 'len', 'mean', 'var', 'std', 'kurtosis', 'skew', 'n_peaks',
             'smooth10_n_peaks', 'smooth20_n_peaks', 'diff_peaks', 'diff2_peaks',
             'diff_var', 'diff2_var', 'gaps_squared', 'len_weighted', 'var_div_duration', 'var_div_len']
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model = TabularNN(input_dim=len(features))
-model.load_state_dict(torch.load('/app/artifacts/model.pth', map_location=device))
+model.load_state_dict(torch.load(f"{app_dir}/artifacts/model.pth", map_location=device))
 if torch.cuda.device_count() > 1:
     model = nn.DataParallel(model)
 model.to(device)
@@ -127,7 +130,7 @@ with torch.no_grad():
 out_df = pd.DataFrame({'segment': df['segment'], 'prediction': preds})
 out_df.to_csv(args.output, index=False)
 """
-    with open('/app/artifacts/inference.py', 'w') as f:
+    with open(f"{app_dir}/artifacts/inference.py", 'w') as f:
         f.write(inference_code)
 
     # Compute training metrics for metrics.json
@@ -147,7 +150,7 @@ out_df.to_csv(args.output, index=False)
         'worst_channel_f1': f1 # Approximation for internal metric
     }
     
-    with open('/app/artifacts/metrics.json', 'w') as f:
+    with open(f"{app_dir}/artifacts/metrics.json", 'w') as f:
         json.dump(metrics, f)
 
 if __name__ == '__main__':

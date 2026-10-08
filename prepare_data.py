@@ -1,7 +1,7 @@
-import pandas as pd
-import numpy as np
-import urllib.request
 import os
+
+import numpy as np
+import pandas as pd
 
 print("Downloading dataset...")
 url = 'https://zenodo.org/api/records/12588359/files/dataset.csv/content'
