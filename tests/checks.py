@@ -155,7 +155,12 @@ def evaluate(context: dict) -> dict:
     if metrics_path.exists():
         try:
             loaded = load_json(metrics_path)
-            metrics.update(loaded)
+            if "sam_testbed_logloss" in loaded:
+                metrics["sam_testbed_logloss"] = loaded["sam_testbed_logloss"]
+            if "commercial_logloss" in loaded:
+                metrics["commercial_logloss"] = loaded["commercial_logloss"]
+            if "macro_ap" in loaded:
+                metrics["macro_ap"] = loaded["macro_ap"]
         except Exception:  # noqa: BLE001, S110
             pass
 

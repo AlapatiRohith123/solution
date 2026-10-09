@@ -11,7 +11,7 @@ Your objective is to train a model to accurately detect these compounds. We will
 Deliverables:
 - A loadable model.
 - An inference entry point (`predict.py` or similar) that we can run.
-- Write your final evaluation metrics to `artifacts/metrics.json` as a JSON object with the primary metrics on a proxy-validation split (e.g. `{"sam_testbed_logloss": <value>, "commercial_logloss": <value>, "macro_ap": <value>}`).
+- Write your final evaluation metrics to a `metrics.json` file as a JSON object with the primary metrics on a proxy-validation split (e.g. `{"sam_testbed_logloss": <value>, "commercial_logloss": <value>, "macro_ap": <value>}`).
 - `claims.json` where every reported number is traceable to an artifact.
 - A short report summarizing your approach.
 
@@ -19,8 +19,8 @@ Note on Evaluation Data Shift:
 The hidden evaluation data features a distribution shift: files are renamed to opaque IDs, temperature ramps are resampled, and intensities are scaled by a secret per-instrument factor. Ensure your proxy validation and modeling approach accounts for this per-instrument shift.
 
 ### Data and Deliverables
-The input data files (including `dataset.csv` and NPZ files) are provided in the relative directory `data/` (e.g. `data/dataset.csv`).
-Your code must output its final metrics to `artifacts/metrics.json`, claims to `artifacts/claims.json`, and write a `predict.py` in the working directory.
+The input data files (including the dataset CSV and NPZ files) are provided in the environment data directory.
+Your code must output its final metrics to `metrics.json`, claims to `claims.json`, and write a `predict.py` in the working directory.
 
 ### Success Criteria
 To successfully pass this task, your model must achieve:

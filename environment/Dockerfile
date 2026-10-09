@@ -5,18 +5,15 @@
 #   FROM nvidia/cuda:12.4.1-cudnn-runtime-ubuntu22.04
 # Tasks are validated in single-container, single-GPU sandboxes — do not
 # assume more than one GPU.
-FROM python:3.12-slim
+FROM python:3.12-slim@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1
 
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONHASHSEED=0
 WORKDIR /app
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends ca-certificates procps ripgrep \
-    && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt /tmp/requirements.txt
-RUN pip install --no-cache-dir -r /tmp/requirements.txt
+RUN pip install --no-cache-dir --require-hashes -r /tmp/requirements.txt
 
 # EDIT: Change the path and filename to match your task's input data.
 COPY task_inputs/ /app/data/

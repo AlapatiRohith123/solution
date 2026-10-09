@@ -13,7 +13,7 @@ tags = ["real-ml", "tabular-ml", "classification", "mars-spectrometry", "multi-l
 source_dataset = "NASA Mars Spectrometry EGA-MS (DrivenData 2022)"
 source_url = "https://registry.opendata.aws/nasa-ega/"
 source_reference_id = "ott-abfn-eejw"
-source_license = "NASA open data"
+source_license = "CC0 1.0"
 
 [environment]
 build_timeout_sec = 1200.0
