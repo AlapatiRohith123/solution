@@ -21,19 +21,19 @@
       "threshold": 0.5,
       "comparison": "lte"
     },
-    "macro_ap": 0.80
+    "macro_ap": 0.15
   },
 
   "attempts": [
     {
       "id": "human_1",
-      "architecture": "Gradient Boosting Classifier",
+      "architecture": "PyTorch MLP",
       "augmentations": "StandardScaler",
       "description": "Baseline model on features.",
       "metrics": {
-        "sam_testbed_logloss": 0.45,
-        "commercial_logloss": 0.45,
-        "macro_ap": 0.85
+        "sam_testbed_logloss": 0.40,
+        "commercial_logloss": 0.40,
+        "macro_ap": 0.19
       }
     }
   ]
