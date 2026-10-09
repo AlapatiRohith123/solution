@@ -33,7 +33,6 @@ import traceback
 from pathlib import Path
 from typing import Any
 
-
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
@@ -54,22 +53,18 @@ def load_json(path: Path) -> dict:
         return json.loads(path.read_text())
     except json.JSONDecodeError as exc:
         raise AssertionError(
-            f"Invalid JSON in {path}: line {exc.lineno}, col {exc.colno}: "
-            f"{exc.msg}"
+            f"Invalid JSON in {path}: line {exc.lineno}, col {exc.colno}: {exc.msg}"
         ) from exc
 
 
 def require_keys(obj: dict, keys: set[str], label: str) -> None:
     """Assert that a dict contains all required keys."""
     if not isinstance(obj, dict):
-        raise AssertionError(
-            f"{label} must be a dict; got {type(obj).__name__}"
-        )
+        raise TypeError(f"{label} must be a dict; got {type(obj).__name__}")
     missing = sorted(keys - set(obj))
     if missing:
         raise AssertionError(
-            f"{label} missing required keys {missing}; "
-            f"found: {sorted(obj)}"
+            f"{label} missing required keys {missing}; found: {sorted(obj)}"
         )
 
 
@@ -79,34 +74,41 @@ def require_keys(obj: dict, keys: set[str], label: str) -> None:
 # Example: "Data Acquisition and Preprocessing"
 # ---------------------------------------------------------------------------
 
+
 def check_data_deliverables() -> str:
     """Check that required data-stage files exist."""
     return "Data preparation is handled implicitly."
+
 
 def check_data_schema() -> str:
     """Validate structure of data artifacts."""
     return "No explicit data artifacts needed."
 
+
 def check_model_deliverables() -> str:
     """Check that required model-stage files exist."""
-    for path in [
-        app_path("predict.py"),
-        app_path("artifacts/metrics.json")
-    ]:
+    for path in [app_path("predict.py"), app_path("artifacts/metrics.json")]:
         assert path.exists(), f"Missing: {path}"
     return "model deliverables exist"
+
 
 def check_metrics_schema() -> str:
     """Validate metrics structure and value ranges."""
     metrics = load_json(app_path("artifacts/metrics.json"))
-    require_keys(metrics, {"sam_testbed_logloss", "commercial_logloss", "macro_ap"}, "metrics.json")
+    require_keys(
+        metrics,
+        {"sam_testbed_logloss", "commercial_logloss", "macro_ap"},
+        "metrics.json",
+    )
     return "metrics schema valid"
+
 
 def check_metrics_thresholds() -> str:
     """Sanity-check that metrics are above a trivial baseline."""
     metrics = load_json(app_path("artifacts/metrics.json"))
     assert metrics["macro_ap"] >= 0.0, "macro_ap must be >= 0.0"
     return "metrics above baseline"
+
 
 def check_final_deliverables() -> str:
     """Check that final output files exist."""
@@ -117,43 +119,76 @@ def check_final_deliverables() -> str:
         assert path.exists(), f"Missing: {path}"
     return "final deliverables exist"
 
+
 def check_report_content() -> str:
     """Verify report discusses required topics with sufficient depth."""
     report = app_path("artifacts/report.md").read_text().lower()
     assert len(report.split()) >= 50, "Report must be >= 50 words"
     return "report content valid"
 
+
 def _criterion(id: str, fn, milestone_id: str = "final") -> dict[str, Any]:
     try:
         detail = fn()
         return {
-            "id": id, "passed": True,
-            "detail": detail or "passed", "milestone_id": milestone_id,
+            "id": id,
+            "passed": True,
+            "detail": detail or "passed",
+            "milestone_id": milestone_id,
         }
-    except Exception:
+    except Exception:  # noqa: BLE001
         return {
-            "id": id, "passed": False,
+            "id": id,
+            "passed": False,
             "detail": traceback.format_exc(limit=6),
             "milestone_id": milestone_id,
         }
 
+
 def evaluate(context: dict) -> dict:
-    metrics = {}
+    metrics = {
+        "sam_testbed_logloss": 0.0,
+        "commercial_logloss": 0.0,
+        "macro_ap": 0.0,
+    }
     metrics_path = app_path("artifacts/metrics.json")
     if metrics_path.exists():
         try:
-            metrics = load_json(metrics_path)
-        except:
+            loaded = load_json(metrics_path)
+            metrics.update(loaded)
+        except Exception:  # noqa: BLE001, S110
             pass
 
     criteria = [
-        _criterion("data_deliverables", check_data_deliverables, milestone_id="data-preparation"),
+        _criterion(
+            "data_deliverables",
+            check_data_deliverables,
+            milestone_id="data-preparation",
+        ),
         _criterion("data_schema", check_data_schema, milestone_id="data-preparation"),
-        _criterion("model_deliverables", check_model_deliverables, milestone_id="model-evaluation"),
-        _criterion("metrics_schema", check_metrics_schema, milestone_id="model-evaluation"),
-        _criterion("metrics_thresholds", check_metrics_thresholds, milestone_id="model-evaluation"),
-        _criterion("final_deliverables", check_final_deliverables, milestone_id="deliverables-and-report"),
-        _criterion("report_content", check_report_content, milestone_id="deliverables-and-report"),
+        _criterion(
+            "model_deliverables",
+            check_model_deliverables,
+            milestone_id="model-evaluation",
+        ),
+        _criterion(
+            "metrics_schema", check_metrics_schema, milestone_id="model-evaluation"
+        ),
+        _criterion(
+            "metrics_thresholds",
+            check_metrics_thresholds,
+            milestone_id="model-evaluation",
+        ),
+        _criterion(
+            "final_deliverables",
+            check_final_deliverables,
+            milestone_id="deliverables-and-report",
+        ),
+        _criterion(
+            "report_content",
+            check_report_content,
+            milestone_id="deliverables-and-report",
+        ),
     ]
 
     return {"criteria": criteria, "metrics": metrics}

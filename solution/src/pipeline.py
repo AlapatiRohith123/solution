@@ -6,9 +6,9 @@ and run.py calls run_full() to produce all required artifacts.
 The agent is expected to produce code that generates the same artifacts
 (as defined in instruction.md). checks.py validates those artifacts.
 """
+
 from __future__ import annotations
 
-import json
 import os
 from pathlib import Path
 from typing import Any
@@ -37,6 +37,7 @@ def _resolve_data_path(path: str | Path | None = None) -> Path:
 # -------------------------------------------------------------------------
 # Milestone 1: Data loading and preprocessing
 # -------------------------------------------------------------------------
+
 
 def load_and_preprocess(
     data_path: str | Path | None = None,
@@ -71,6 +72,7 @@ def load_and_preprocess(
 # Milestone 2: Model training and evaluation
 # -------------------------------------------------------------------------
 
+
 def train_and_evaluate(
     data_path: str | Path | None = None,
     output_dir: str | Path | None = None,
@@ -104,6 +106,7 @@ def train_and_evaluate(
 # -------------------------------------------------------------------------
 # Full end-to-end pipeline
 # -------------------------------------------------------------------------
+
 
 def run_full(
     data_path: str | Path | None = None,
