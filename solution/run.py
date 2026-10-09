@@ -109,7 +109,7 @@ def main():
     criterion = nn.BCELoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
     
-    epochs = 5
+    epochs = 20
     for epoch in range(epochs):
         model.train()
         total_loss = 0
@@ -141,7 +141,16 @@ def main():
     all_targets = np.vstack(all_targets)
     
     # Calculate metrics
-    val_logloss = log_loss(all_targets, all_preds)
+    # Multi-label log loss = average of binary cross entropies
+    logloss_per_class = []
+    for i in range(all_targets.shape[1]):
+        # adding a small epsilon to avoid log(0)
+        p = np.clip(all_preds[:, i], 1e-15, 1 - 1e-15)
+        t = all_targets[:, i]
+        ll = -np.mean(t * np.log(p) + (1 - t) * np.log(1 - p))
+        logloss_per_class.append(ll)
+    
+    val_logloss = np.mean(logloss_per_class)
     
     # Some targets might only have 1 class in validation, AP needs 2 classes
     macro_aps = []
