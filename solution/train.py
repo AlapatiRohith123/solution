@@ -82,6 +82,7 @@ def main():
     # Generate inference script
     inference_code = """
 import argparse
+import os
 import pandas as pd
 import torch
 import torch.nn as nn
@@ -110,7 +111,7 @@ parser.add_argument('--output', required=True)
 args = parser.parse_args()
 
 app_dir = os.environ.get("APP_DIR", "/app")
-    df = pd.read_csv(args.input)
+df = pd.read_csv(args.input)
 features = ['duration', 'len', 'mean', 'var', 'std', 'kurtosis', 'skew', 'n_peaks',
             'smooth10_n_peaks', 'smooth20_n_peaks', 'diff_peaks', 'diff2_peaks',
             'diff_var', 'diff2_var', 'gaps_squared', 'len_weighted', 'var_div_duration', 'var_div_len']
