@@ -1,36 +1,65 @@
 {
+  "task_id": "otter/mars-evolved-gas-spectra-detection",
   "milestones": [
     {
-      "milestone_id": "model_artifacts",
-      "description": "Model and inference script created",
+      "id": "data-preparation",
+      "name": "Data Preparation",
+      "description": "Load and preprocess data, produce processed artifacts, document provenance",
+      "type": "deterministic",
       "critical": true,
       "criteria": [
         {
-          "criterion_id": "inference_exists",
-          "description": "Inference script exists",
-          "weight": 0.5
+          "id": "data_deliverables",
+          "description": "Required data-stage files exist",
+          "weight": 1.0
         },
         {
-          "criterion_id": "metrics_json_exists",
-          "description": "Metrics JSON exists",
-          "weight": 0.5
+          "id": "data_schema",
+          "description": "Data artifacts have correct structure and values",
+          "weight": 1.5
         }
       ]
     },
     {
-      "milestone_id": "inference_evaluation",
-      "description": "Inference runs on hidden set and evaluates",
+      "id": "model-evaluation",
+      "name": "Model Training and Evaluation",
+      "description": "Train model, evaluate against baselines, meet performance thresholds",
+      "type": "deterministic",
       "critical": true,
       "criteria": [
         {
-          "criterion_id": "inference_runs",
-          "description": "Inference executes without crashing",
-          "weight": 0.5
+          "id": "model_deliverables",
+          "description": "Required model-stage files exist",
+          "weight": 1.0
         },
         {
-          "criterion_id": "performance_measured",
-          "description": "Performance metrics calculated",
-          "weight": 0.5
+          "id": "metrics_schema",
+          "description": "Metrics have correct structure and plausible values",
+          "weight": 1.5
+        },
+        {
+          "id": "metrics_thresholds",
+          "description": "Model metrics meet minimum quality thresholds",
+          "weight": 3.0
+        }
+      ]
+    },
+    {
+      "id": "deliverables-and-report",
+      "name": "Deliverables and Report",
+      "description": "All artifacts valid and report meets quality standards. critical=false: failing this milestone costs rubric points but does not fail the task",
+      "type": "deterministic",
+      "critical": false,
+      "criteria": [
+        {
+          "id": "final_deliverables",
+          "description": "Final results and report files exist",
+          "weight": 1.0
+        },
+        {
+          "id": "report_content",
+          "description": "Report discusses required topics with sufficient depth",
+          "weight": 2.0
         }
       ]
     }

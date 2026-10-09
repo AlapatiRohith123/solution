@@ -1,15 +1,19 @@
-Build an end-to-end tabular ML system for CubeSat Telemetry Fragment Anomaly Detection on the OPSSAT-AD dataset. 
+You are tasked with building an end-to-end tabular ML system for the Mars Evolved-Gas Spectra: Multi-Label Compound Detection From Commercial Instruments to the SAM Testbed task.
 
-You are provided with tabular telemetry fragments in `/app/task_inputs/dataset.csv`.
-- The dataset contains features derived from univariate fragments.
-- It includes data from 6 channels.
-- Only ~10% of the fragments are labelled (where `anomaly` is 0 or 1). The rest are unlabelled (`anomaly` is -1).
-- The goal is to detect anomalous fragments (binary classification).
+You are provided with NASA Mars Spectrometry EGA-MS (DrivenData 2022) data containing commercial-instrument and SAM-testbed spectra, with 10 compound-family labels.
+Specifically, you have access to:
+- Commercial-instrument spectra (m/z x temperature x time) with labels.
+- ~10 labelled SAM-testbed samples.
+- Unlabelled SAM-testbed spectra.
 
-You must:
-1. Train a model capable of detecting anomalies, robust to distribution shifts (new channels).
-2. Save your trained model artifact(s) to `/app/artifacts/`.
-3. Create an inference script `/app/artifacts/inference.py` that takes an input CSV path and an output CSV path as arguments (`python /app/artifacts/inference.py --input <input_csv> --output <output_csv>`). It should load your model and write predictions (with columns `segment` and `prediction`, where prediction is probability or binary label) to the output CSV.
-4. Generate evaluation metrics on your internal validation set and save them to `/app/artifacts/metrics.json`. Your JSON should have keys: `mcc`, `auc_pr`, and `worst_channel_f1`.
+Your objective is to train a model to accurately detect these compounds. We will evaluate your solution on a hidden verifier-owned split containing the remaining SAM-testbed samples and commercial competition-test samples.
 
-We will evaluate your inference script on a hidden split containing 3 held-out channels and the remaining 90% of the visible channels. Pass requires beating the human baseline mean on the hidden evaluation.
+Deliverables:
+- A loadable model.
+- An inference entry point (`predict.py` or similar) that we can run.
+- Write your final evaluation metrics to `/app/artifacts/metrics.json` as a JSON object with the primary metrics on a proxy-validation split (e.g. `{"sam_testbed_logloss": <value>, "commercial_logloss": <value>, "macro_ap": <value>}`).
+- `claims.json` where every reported number is traceable to an artifact.
+- A short report summarizing your approach.
+
+Note on Evaluation Data Shift:
+The hidden evaluation data features a distribution shift: files are renamed to opaque IDs, temperature ramps are resampled, and intensities are scaled by a secret per-instrument factor. Ensure your proxy validation and modeling approach accounts for this per-instrument shift.

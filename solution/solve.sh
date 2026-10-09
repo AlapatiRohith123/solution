@@ -1,5 +1,6 @@
 #!/bin/bash
 set -e
+
 cd /app
-mkdir -p /app/artifacts
-python3 solution/train.py
+python3 solution/run.py
+echo "Task completed successfully."

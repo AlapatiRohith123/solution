@@ -1,32 +1,39 @@
 {
-  "task_id": "otter/opssat-ad",
-  "pass_criteria": [
-    {
-      "metric": "mcc",
-      "threshold": 0.0,
-      "comparison": "gte",
-      "pass_rate": 0.5
-    },
-    {
-      "metric": "auc_pr",
-      "threshold": 0.0,
-      "comparison": "gte",
-      "pass_rate": 0.5
-    },
-    {
-      "metric": "worst_channel_f1",
-      "threshold": 0.0,
-      "comparison": "gte",
-      "pass_rate": 0.5
-    }
+  "task_id": "otter/mars-evolved-gas-spectra-detection",
+  "_pass_criteria_help": [
+    "Each key must match a key in the 'metrics' dict returned by checks.py.",
+    "",
+    "Simple form (number) — higher is better, uses >= comparison:",
+    "  \"auroc\": 0.80",
+    "",
+    "Object form — for metrics where lower is better or exact match:",
+    "  \"loss\": {\"threshold\": 0.5, \"comparison\": \"lte\"}",
+    "",
+    "Supported comparisons: gte (>=), gt (>), lte (<=), lt (<), eq (==)",
+    "Default comparison when using simple form: gte (>=)"
   ],
+  "pass_criteria": {
+    "sam_testbed_logloss": {
+      "threshold": 0.5,
+      "comparison": "lte"
+    },
+    "commercial_logloss": {
+      "threshold": 0.5,
+      "comparison": "lte"
+    },
+    "macro_ap": 0.80
+  },
+
   "attempts": [
     {
-      "attempt_id": "oracle-001",
+      "id": "human_1",
+      "architecture": "Gradient Boosting Classifier",
+      "augmentations": "StandardScaler",
+      "description": "Baseline model on features.",
       "metrics": {
-        "mcc": 0.5,
-        "auc_pr": 0.5,
-        "worst_channel_f1": 0.5
+        "sam_testbed_logloss": 0.45,
+        "commercial_logloss": 0.45,
+        "macro_ap": 0.85
       }
     }
   ]
