@@ -10,7 +10,7 @@ Your objective is to train a model to accurately detect these compounds. We will
 
 Deliverables:
 - A loadable model.
-- An inference entry point (`predict.py` or similar) that we can run.
+- An inference entry point `predict.py` that accepts `--test_features` (path to a test features zip) and `--predictions_output` (path to write output predictions CSV). The output CSV must contain `sample_id` and the 10 predicted probability columns.
 - Write your final evaluation metrics to `/app/artifacts/metrics.json` as a JSON object with the primary metrics on a proxy-validation split (e.g. `{"sam_testbed_logloss": <value>, "commercial_logloss": <value>, "macro_ap": <value>}`).
 - `/app/artifacts/claims.json` where every reported number is traceable to an artifact.
 - A short report summarizing your approach.

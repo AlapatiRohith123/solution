@@ -26,7 +26,7 @@
 
   "attempts": [
     {
-      "id": "human_1",
+      "attempt_id": "human_1",
       "architecture": "PyTorch MLP",
       "augmentations": "StandardScaler",
       "description": "Baseline model on features.",

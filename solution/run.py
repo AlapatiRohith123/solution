@@ -35,17 +35,23 @@ class EGADataset(Dataset):
             print(f"Extracting {zip_path}...")
             with zipfile.ZipFile(zip_path, "r") as z:
                 z.extractall(self.extract_dir)
+                
+        # Build file map
+        self.file_map = {}
+        for root, dirs, files in os.walk(self.extract_dir):
+            for f in files:
+                if f.endswith(".csv"):
+                    sid = f.split(".")[0]
+                    self.file_map[sid] = os.path.join(root, f)
 
     def __len__(self):
         return len(self.labels_df)
 
     def __getitem__(self, idx):
         sample_id = self.sample_ids[idx]
-        csv_path = os.path.join(
-            self.extract_dir,
-            self.zip_path.split("/")[-1].split(".")[0],
-            f"{sample_id}.csv",
-        )
+        # the zip structure might contain the folder or directly the files
+        # so we search for the file
+        csv_path = self.file_map.get(str(sample_id))
 
         if os.path.exists(csv_path):
             df = pd.read_csv(csv_path)
@@ -137,6 +143,15 @@ def main():
             f"Epoch {epoch + 1}/{epochs} - Train Loss: {train_loss:.4f} - Time: {time.time() - t0:.2f}s"
         )
 
+    # Save the model
+    models_dir = os.environ.get("OTTER_APP_DIR", "/app") + "/models"
+    os.makedirs(models_dir, exist_ok=True)
+    
+    if isinstance(model, nn.DataParallel):
+        torch.save(model.module.state_dict(), f"{models_dir}/best.pt")
+    else:
+        torch.save(model.state_dict(), f"{models_dir}/best.pt")
+
     # Evaluate
     model.eval()
     all_preds = []
@@ -197,7 +212,77 @@ def main():
 
     predict_py = os.environ.get("OTTER_APP_DIR", "/app") + "/predict.py"
     with open(predict_py, "w") as f:
-        f.write("print('predict')\n")
+        f.write('''import argparse
+import pandas as pd
+import numpy as np
+import zipfile
+import os
+import torch
+from torch import nn
+
+class SimpleMLP(nn.Module):
+    def __init__(self, input_dim, output_dim):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(input_dim, 256),
+            nn.ReLU(),
+            nn.Dropout(0.3),
+            nn.Linear(256, 128),
+            nn.ReLU(),
+            nn.Dropout(0.3),
+            nn.Linear(128, output_dim),
+            nn.Sigmoid(),
+        )
+    def forward(self, x):
+        return self.net(x)
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--test_features")
+parser.add_argument("--predictions_output")
+args = parser.parse_args()
+
+model = SimpleMLP(100, 10)
+model.load_state_dict(torch.load("/app/models/best.pt", map_location="cpu", weights_only=True))
+model.eval()
+
+extract_dir = "temp_predict"
+os.makedirs(extract_dir, exist_ok=True)
+with zipfile.ZipFile(args.test_features, "r") as z:
+    z.extractall(extract_dir)
+    sample_ids = [n.split("/")[-1].split(".")[0] for n in z.namelist() if n.endswith(".csv")]
+
+results = []
+for sid in sample_ids:
+    csv_path = None
+    for root, dirs, files in os.walk(extract_dir):
+        if f"{sid}.csv" in files:
+            csv_path = os.path.join(root, f"{sid}.csv")
+            break
+    
+    feat = np.zeros(100, dtype=np.float32)
+    if csv_path and os.path.exists(csv_path):
+        df = pd.read_csv(csv_path)
+        if "m/z" in df.columns and "abundance" in df.columns:
+            grouped = df.groupby("m/z")["abundance"].mean().to_dict()
+            for mz, val in grouped.items():
+                mz_idx = round(mz)
+                if 0 <= mz_idx < 100:
+                    feat[mz_idx] = val
+    
+    feat = feat / (np.max(feat) + 1e-6)
+    x = torch.tensor(feat).unsqueeze(0)
+    
+    with torch.no_grad():
+        preds = model(x).squeeze(0).numpy()
+    
+    row = {"sample_id": sid}
+    for i in range(10):
+        row[f"class_{i}"] = preds[i]
+    results.append(row)
+
+res_df = pd.DataFrame(results)
+res_df.to_csv(args.predictions_output, index=False)
+''')
 
 
 if __name__ == "__main__":

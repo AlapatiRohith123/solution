@@ -1,0 +1,5 @@
+sample_id,basalt,carbonate,chloride,iron_oxide,oxalate,oxychlorine,phyllosilicate,silicate,sulfate,sulfide,instrument_type
+S0766,0,0,0,0,0,0,0,0,0,0,commercial
+S0767,0,0,0,0,0,0,0,0,0,0,commercial
+S0768,1,0,0,0,0,0,1,1,0,0,sam_testbed
+S0769,0,0,0,0,0,1,0,0,1,0,sam_testbed

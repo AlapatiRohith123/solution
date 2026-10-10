@@ -30,8 +30,55 @@ from __future__ import annotations
 import json
 import os
 import traceback
+import subprocess
+import pandas as pd
+import numpy as np
+from sklearn.metrics import log_loss, average_precision_score
 from pathlib import Path
 from typing import Any
+
+def run_inference_and_evaluate():
+    cmd = [
+        "python3", str(app_path("predict.py")),
+        "--test_features", "/app/tests/data/hidden_test_features.zip",
+        "--predictions_output", "/app/artifacts/predictions.csv"
+    ]
+    subprocess.run(cmd, check=True, capture_output=True, text=True)
+    
+    preds = pd.read_csv(app_path("artifacts/predictions.csv"))
+    true_labels = pd.read_csv("/app/tests/data/hidden_test_labels.csv")
+    
+    preds = preds.set_index("sample_id").sort_index()
+    true_labels = true_labels.set_index("sample_id").sort_index()
+    
+    sam_idx = true_labels['instrument_type'] == 'sam_testbed'
+    com_idx = true_labels['instrument_type'] == 'commercial'
+    
+    pred_sam = preds.loc[sam_idx].values
+    true_sam = true_labels.loc[sam_idx].drop('instrument_type', axis=1).values
+    pred_com = preds.loc[com_idx].values
+    true_com = true_labels.loc[com_idx].drop('instrument_type', axis=1).values
+    
+    pred_sam = np.clip(pred_sam, 1e-15, 1 - 1e-15)
+    pred_com = np.clip(pred_com, 1e-15, 1 - 1e-15)
+    
+    sam_loss = log_loss(true_sam.flatten(), pred_sam.flatten()) if len(true_sam) > 0 else 0.5
+    com_loss = log_loss(true_com.flatten(), pred_com.flatten()) if len(true_com) > 0 else 0.5
+    
+    y_true = true_labels.drop('instrument_type', axis=1).values
+    y_pred = preds.values
+    aps = []
+    for i in range(y_true.shape[1]):
+        if len(np.unique(y_true[:, i])) > 1:
+            aps.append(average_precision_score(y_true[:, i], y_pred[:, i]))
+    macro_ap = np.mean(aps) if aps else 0.0
+    
+    return {
+        "sam_testbed_logloss": float(sam_loss),
+        "commercial_logloss": float(com_loss),
+        "macro_ap": float(macro_ap)
+    }
+
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -105,9 +152,12 @@ def check_metrics_schema() -> str:
 
 def check_metrics_thresholds() -> str:
     """Sanity-check that metrics are above a trivial baseline."""
-    metrics = load_json(app_path("artifacts/metrics.json"))
-    assert metrics["macro_ap"] >= 0.0, "macro_ap must be >= 0.0"
-    return "metrics above baseline"
+    try:
+        metrics = run_inference_and_evaluate()
+        assert metrics["macro_ap"] >= 0.0, "macro_ap must be >= 0.0"
+        return "inference successful and metrics above baseline"
+    except Exception as e:
+        raise AssertionError(f"Inference failed: {e}")
 
 
 def check_final_deliverables() -> str:
@@ -146,23 +196,14 @@ def _criterion(id: str, fn, milestone_id: str = "final") -> dict[str, Any]:
 
 
 def evaluate(context: dict) -> dict:
-    metrics = {
-        "sam_testbed_logloss": 0.0,
-        "commercial_logloss": 0.0,
-        "macro_ap": 0.0,
-    }
-    metrics_path = app_path("artifacts/metrics.json")
-    if metrics_path.exists():
-        try:
-            loaded = load_json(metrics_path)
-            if "sam_testbed_logloss" in loaded:
-                metrics["sam_testbed_logloss"] = loaded["sam_testbed_logloss"]
-            if "commercial_logloss" in loaded:
-                metrics["commercial_logloss"] = loaded["commercial_logloss"]
-            if "macro_ap" in loaded:
-                metrics["macro_ap"] = loaded["macro_ap"]
-        except Exception:  # noqa: BLE001, S110
-            pass
+    try:
+        metrics = run_inference_and_evaluate()
+    except Exception as e:
+        metrics = {
+            "sam_testbed_logloss": 1.0,
+            "commercial_logloss": 1.0,
+            "macro_ap": 0.0,
+        }
 
     criteria = [
         _criterion(

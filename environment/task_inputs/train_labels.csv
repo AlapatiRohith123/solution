@@ -1,0 +1,6 @@
+sample_id,basalt,carbonate,chloride,iron_oxide,oxalate,oxychlorine,phyllosilicate,silicate,sulfate,sulfide
+S0000,0,0,0,0,0,0,0,0,1,0
+S0001,0,1,0,0,0,0,0,0,0,0
+S0002,0,0,0,0,0,1,0,0,0,0
+S0003,0,1,0,1,0,0,0,0,1,0
+S0004,0,0,0,1,0,1,1,0,0,0
