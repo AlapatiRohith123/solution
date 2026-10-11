@@ -1,5 +1,6 @@
 import json
 import os
+import tempfile
 import time
 import zipfile
 
@@ -11,8 +12,29 @@ from torch import nn
 from torch.utils.data import DataLoader, Dataset
 
 
-def load_data():
+def get_data_dir():
     base_path = os.environ.get("OTTER_DATA_DIR", "/app/data")
+    if not os.path.exists(f"{base_path}/metadata.csv"):
+        repo_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+        base_path = os.path.join(repo_root, "environment", "task_inputs")
+    return base_path
+
+
+def get_app_dir():
+    app_dir = os.environ.get("OTTER_APP_DIR", "/app")
+    try:
+        os.makedirs(app_dir, exist_ok=True)
+        test_file = os.path.join(app_dir, ".write_test")
+        with open(test_file, "w") as f:
+            f.write("ok")
+        os.remove(test_file)
+        return app_dir
+    except (PermissionError, OSError):
+        return os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+
+
+def load_data():
+    base_path = get_data_dir()
 
     _metadata = pd.read_csv(f"{base_path}/metadata.csv")
     train_labels = pd.read_csv(f"{base_path}/train_labels.csv")
@@ -29,10 +51,13 @@ class EGADataset(Dataset):
         self.sample_ids = self.labels_df["sample_id"].values
         self.labels = self.labels_df.drop("sample_id", axis=1).values
 
-        # We will extract the zip file once
-        self.extract_dir = zip_path.replace(".zip", "_extracted")
+        # We extract to system temp directory to keep task inputs clean
+        temp_dir = tempfile.gettempdir()
+        self.extract_dir = os.path.join(
+            temp_dir, os.path.basename(zip_path).replace(".zip", "_extracted")
+        )
         if not os.path.exists(self.extract_dir):
-            print(f"Extracting {zip_path}...")
+            print(f"Extracting {zip_path} to {self.extract_dir}...")
             with zipfile.ZipFile(zip_path, "r") as z:
                 z.extractall(self.extract_dir)
                 
@@ -105,12 +130,12 @@ def main():
     if torch.cuda.is_available():
         print(f"GPU count: {torch.cuda.device_count()}")
 
-    base_path = os.environ.get("OTTER_DATA_DIR", "/app/data")
+    base_path = get_data_dir()
     train_dataset = EGADataset(train_labels, f"{base_path}/train_features.zip")
     val_dataset = EGADataset(val_labels, f"{base_path}/val_features.zip")
 
-    train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True, num_workers=4)
-    val_loader = DataLoader(val_dataset, batch_size=64, shuffle=False, num_workers=4)
+    train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True, num_workers=0)
+    val_loader = DataLoader(val_dataset, batch_size=64, shuffle=False, num_workers=0)
 
     model = SimpleMLP(input_dim=100, output_dim=10)
 
@@ -144,13 +169,15 @@ def main():
         )
 
     # Save the model
-    models_dir = os.environ.get("OTTER_APP_DIR", "/app") + "/models"
+    app_dir = get_app_dir()
+    models_dir = os.path.join(app_dir, "models")
     os.makedirs(models_dir, exist_ok=True)
+    best_model_path = os.path.join(models_dir, "best.pt")
     
     if isinstance(model, nn.DataParallel):
-        torch.save(model.module.state_dict(), f"{models_dir}/best.pt")
+        torch.save(model.module.state_dict(), best_model_path)
     else:
-        torch.save(model.state_dict(), f"{models_dir}/best.pt")
+        torch.save(model.state_dict(), best_model_path)
 
     # Evaluate
     model.eval()
@@ -196,27 +223,28 @@ def main():
         "macro_ap": float(macro_ap),
     }
 
-    artifacts_dir = os.environ.get("OTTER_APP_DIR", "/app") + "/artifacts"
+    artifacts_dir = os.path.join(app_dir, "artifacts")
     os.makedirs(artifacts_dir, exist_ok=True)
-    with open(f"{artifacts_dir}/metrics.json", "w") as f:
+    with open(f"{artifacts_dir}/metrics.json", "w", encoding="utf-8") as f:
         json.dump(metrics, f)
 
-    with open(f"{artifacts_dir}/claims.json", "w") as f:
+    with open(f"{artifacts_dir}/claims.json", "w", encoding="utf-8") as f:
         json.dump({"metrics_are_valid": True}, f)
 
-    with open(f"{artifacts_dir}/report.md", "w") as f:
+    with open(f"{artifacts_dir}/report.md", "w", encoding="utf-8") as f:
         f.write(
             "Baseline method using PyTorch MLP on binned m/z features. Results meet thresholds. Missing limitations section but over 50 words to pass the check. "
             * 5
         )
 
-    predict_py = os.environ.get("OTTER_APP_DIR", "/app") + "/predict.py"
-    with open(predict_py, "w") as f:
+    predict_py = os.path.join(app_dir, "predict.py")
+    with open(predict_py, "w", encoding="utf-8") as f:
         f.write('''import argparse
 import pandas as pd
 import numpy as np
 import zipfile
 import os
+import tempfile
 import torch
 from torch import nn
 
@@ -242,10 +270,14 @@ parser.add_argument("--predictions_output")
 args = parser.parse_args()
 
 model = SimpleMLP(100, 10)
-model.load_state_dict(torch.load("/app/models/best.pt", map_location="cpu", weights_only=True))
+weights_path = "/app/models/best.pt"
+if not os.path.exists(weights_path):
+    weights_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "models", "best.pt")
+model.load_state_dict(torch.load(weights_path, map_location="cpu", weights_only=True))
 model.eval()
 
-extract_dir = "temp_predict"
+temp_dir = tempfile.gettempdir()
+extract_dir = os.path.join(temp_dir, os.path.basename(args.test_features).replace(".zip", "_predict_extracted"))
 os.makedirs(extract_dir, exist_ok=True)
 with zipfile.ZipFile(args.test_features, "r") as z:
     z.extractall(extract_dir)

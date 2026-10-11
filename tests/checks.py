@@ -29,6 +29,7 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 import traceback
 import subprocess
 import pandas as pd
@@ -38,15 +39,31 @@ from pathlib import Path
 from typing import Any
 
 def run_inference_and_evaluate():
+    predict_script = app_path("predict.py")
+    if not predict_script.exists():
+        predict_script = Path(__file__).parent.parent / "predict.py"
+        
+    hidden_features = Path("/app/tests/data/hidden_test_features.zip")
+    if not hidden_features.exists():
+        hidden_features = Path(__file__).parent / "data" / "hidden_test_features.zip"
+        
+    hidden_labels_path = Path("/app/tests/data/hidden_test_labels.csv")
+    if not hidden_labels_path.exists():
+        hidden_labels_path = Path(__file__).parent / "data" / "hidden_test_labels.csv"
+        
+    artifacts_dir = app_path("artifacts")
+    artifacts_dir.mkdir(parents=True, exist_ok=True)
+    preds_output = artifacts_dir / "predictions.csv"
+
     cmd = [
-        "python3", str(app_path("predict.py")),
-        "--test_features", "/app/tests/data/hidden_test_features.zip",
-        "--predictions_output", "/app/artifacts/predictions.csv"
+        sys.executable, str(predict_script),
+        "--test_features", str(hidden_features),
+        "--predictions_output", str(preds_output)
     ]
     subprocess.run(cmd, check=True, capture_output=True, text=True)
     
-    preds = pd.read_csv(app_path("artifacts/predictions.csv"))
-    true_labels = pd.read_csv("/app/tests/data/hidden_test_labels.csv")
+    preds = pd.read_csv(preds_output)
+    true_labels = pd.read_csv(hidden_labels_path)
     
     preds = preds.set_index("sample_id").sort_index()
     true_labels = true_labels.set_index("sample_id").sort_index()
@@ -62,8 +79,15 @@ def run_inference_and_evaluate():
     pred_sam = np.clip(pred_sam, 1e-15, 1 - 1e-15)
     pred_com = np.clip(pred_com, 1e-15, 1 - 1e-15)
     
-    sam_loss = log_loss(true_sam.flatten(), pred_sam.flatten()) if len(true_sam) > 0 else 0.5
-    com_loss = log_loss(true_com.flatten(), pred_com.flatten()) if len(true_com) > 0 else 0.5
+    def compute_bce(y_t, y_p):
+        if len(y_t) == 0:
+            return 0.5
+        y_p = np.clip(y_p.flatten().astype(np.float64), 1e-15, 1.0 - 1e-15)
+        y_true_flat = y_t.flatten().astype(np.float64)
+        return float(-np.mean(y_true_flat * np.log(y_p) + (1.0 - y_true_flat) * np.log(1.0 - y_p)))
+
+    sam_loss = compute_bce(true_sam, pred_sam)
+    com_loss = compute_bce(true_com, pred_com)
     
     y_true = true_labels.drop('instrument_type', axis=1).values
     y_pred = preds.values
@@ -97,7 +121,7 @@ def load_json(path: Path) -> dict:
     if not path.exists():
         raise AssertionError(f"Missing JSON file: {path}")
     try:
-        return json.loads(path.read_text())
+        return json.loads(path.read_text(encoding="utf-8"))
     except json.JSONDecodeError as exc:
         raise AssertionError(
             f"Invalid JSON in {path}: line {exc.lineno}, col {exc.colno}: {exc.msg}"
@@ -172,7 +196,7 @@ def check_final_deliverables() -> str:
 
 def check_report_content() -> str:
     """Verify report discusses required topics with sufficient depth."""
-    report = app_path("artifacts/report.md").read_text().lower()
+    report = app_path("artifacts/report.md").read_text(encoding="utf-8").lower()
     assert len(report.split()) >= 50, "Report must be >= 50 words"
     return "report content valid"
 
