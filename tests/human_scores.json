@@ -16,6 +16,7 @@
   },
   "attempts": [
     {
+      "id": "oracle-001",
       "attempt_id": "oracle-001",
       "architecture": "Tabular Ensemble MLP",
       "augmentations": "None",
