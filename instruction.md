@@ -19,11 +19,11 @@ Note on Evaluation Data Shift:
 The hidden evaluation data features a distribution shift: files are renamed to opaque IDs, temperature ramps are resampled, and intensities are scaled by a secret per-instrument factor. Ensure your proxy validation and modeling approach accounts for this per-instrument shift.
 
 ### Data and Deliverables
-The input data files (including `dataset.csv` and NPZ files) are provided in `/app/data/`.
+The input data files (`metadata.csv`, `train_labels.csv`, `val_labels.csv`, `train_features.zip`, `val_features.zip`) are provided in `/app/data/`.
 Your code must output its final metrics to `/app/artifacts/metrics.json`, claims to `/app/artifacts/claims.json`, and write `/app/predict.py`.
 
 ### Success Criteria
 To successfully pass this task, your model must achieve:
-- `sam_testbed_logloss` <= 0.5
-- `commercial_logloss` <= 0.5
+- `sam_testbed_logloss` <= 0.7
+- `commercial_logloss` <= 0.7
 - `macro_ap` >= 0.15

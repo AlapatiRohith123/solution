@@ -28,12 +28,12 @@
     {
       "attempt_id": "human_1",
       "architecture": "PyTorch MLP",
-      "augmentations": "StandardScaler",
-      "description": "Baseline model on features.",
+      "augmentations": "m/z binning and abundance normalization",
+      "description": "Baseline PyTorch MLP model trained on binned m/z features.",
       "metrics": {
-        "sam_testbed_logloss": 0.40,
-        "commercial_logloss": 0.40,
-        "macro_ap": 0.19
+        "sam_testbed_logloss": 0.6456,
+        "commercial_logloss": 0.5841,
+        "macro_ap": 0.70
       }
     }
   ]
