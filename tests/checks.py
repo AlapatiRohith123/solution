@@ -28,10 +28,9 @@ def evaluate(context=None):
             if fname in ('inference.py', 'metrics.json', 'hidden_preds.csv'):
                 continue
             fpath = os.path.join(artifacts_dir, fname)
-            if os.path.isfile(fpath) and os.path.getsize(fpath) > 0:
-                if any(fname.endswith(ext) for ext in valid_exts) or fname.startswith('model'):
-                    model_artifact_found = True
-                    break
+            if os.path.isfile(fpath) and os.path.getsize(fpath) > 0 and (any(fname.endswith(ext) for ext in valid_exts) or fname.startswith('model')):
+                model_artifact_found = True
+                break
     results['model_artifact_exists'] = model_artifact_found
 
     # 2. Check inference script existence
@@ -59,7 +58,7 @@ def evaluate(context=None):
                         break
                 if valid_values:
                     metrics_json_ok = True
-        except Exception:
+        except Exception:  # noqa: BLE001
             metrics_json_ok = False
     results['metrics_json_exists'] = metrics_json_ok
 
@@ -71,12 +70,12 @@ def evaluate(context=None):
     try:
         subprocess.run(inference_cmd, check=True, env=env)
         results['inference_runs'] = True
-    except Exception:
+    except Exception:  # noqa: BLE001
         try:
             inference_cmd[0] = 'python'
             subprocess.run(inference_cmd, check=True, env=env)
             results['inference_runs'] = True
-        except Exception:
+        except Exception:  # noqa: BLE001
             results['inference_runs'] = False
             return _pack_results(results, metrics)
 
@@ -103,7 +102,7 @@ def evaluate(context=None):
 
         metrics['worst_channel_f1'] = float(min(channel_f1s)) if channel_f1s else 0.0
         results['performance_measured'] = True
-    except Exception:
+    except Exception:  # noqa: BLE001
         results['performance_measured'] = False
 
     return _pack_results(results, metrics)
@@ -113,7 +112,7 @@ def _pack_results(results, metrics):
     criteria_list = [
         {"id": "model_artifact_exists", "milestone_id": "model_artifacts", "passed": results.get("model_artifact_exists", False)},
         {"id": "inference_exists", "milestone_id": "model_artifacts", "passed": results.get("inference_exists", False)},
-        {"id": "metrics_json_exists", "milestone_id": "model_artifacts", "passed": results.get("metrics_json_exists", False)},
+        {"id": "metrics_json_exists", "milestone_id": "metrics_artifacts", "passed": results.get("metrics_json_exists", False)},
         {"id": "inference_runs", "milestone_id": "inference_evaluation", "passed": results.get("inference_runs", False)},
         {"id": "performance_measured", "milestone_id": "inference_evaluation", "passed": results.get("performance_measured", False)}
     ]

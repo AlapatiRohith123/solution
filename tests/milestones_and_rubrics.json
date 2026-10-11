@@ -6,21 +6,28 @@
       "criteria": [
         {
           "description": "Trained model artifact exists and is non-empty",
-          "weight": 0.3,
+          "weight": 0.5,
           "id": "model_artifact_exists"
         },
         {
           "description": "Inference script exists in artifacts directory",
-          "weight": 0.3,
+          "weight": 0.5,
           "id": "inference_exists"
-        },
-        {
-          "description": "Metrics JSON exists and contains required keys",
-          "weight": 0.4,
-          "id": "metrics_json_exists"
         }
       ],
       "id": "model_artifacts"
+    },
+    {
+      "description": "Internal validation metrics recorded in metrics.json",
+      "critical": true,
+      "criteria": [
+        {
+          "description": "Metrics JSON exists and contains required keys",
+          "weight": 1.0,
+          "id": "metrics_json_exists"
+        }
+      ],
+      "id": "metrics_artifacts"
     },
     {
       "description": "Inference runs on hidden set and evaluates",

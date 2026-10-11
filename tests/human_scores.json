@@ -16,65 +16,10 @@
   },
   "attempts": [
     {
-      "attempt_id": "baseline-001",
-      "architecture": "Isolation Forest",
-      "augmentations": "None",
-      "description": "Unsupervised tree isolation baseline on fragment features",
-      "metrics": {
-        "mcc": 0.482,
-        "auc_pr": 0.651,
-        "worst_channel_f1": 0.352
-      }
-    },
-    {
-      "attempt_id": "baseline-002",
-      "architecture": "AutoEncoder",
-      "augmentations": "None",
-      "description": "Reconstruction-based anomaly detector on normalized tabular inputs",
-      "metrics": {
-        "mcc": 0.521,
-        "auc_pr": 0.684,
-        "worst_channel_f1": 0.38
-      }
-    },
-    {
-      "attempt_id": "baseline-003",
-      "architecture": "Random Forest",
-      "augmentations": "None",
-      "description": "Supervised ensemble classifier trained on labelled subset",
-      "metrics": {
-        "mcc": 0.564,
-        "auc_pr": 0.718,
-        "worst_channel_f1": 0.415
-      }
-    },
-    {
-      "attempt_id": "baseline-004",
-      "architecture": "LightGBM",
-      "augmentations": "None",
-      "description": "Gradient boosting tree baseline with balanced class weights",
-      "metrics": {
-        "mcc": 0.589,
-        "auc_pr": 0.725,
-        "worst_channel_f1": 0.422
-      }
-    },
-    {
-      "attempt_id": "baseline-005",
-      "architecture": "Single MLP",
-      "augmentations": "None",
-      "description": "3-layer neural network trained with standard binary cross-entropy",
-      "metrics": {
-        "mcc": 0.594,
-        "auc_pr": 0.722,
-        "worst_channel_f1": 0.431
-      }
-    },
-    {
       "attempt_id": "oracle-001",
       "architecture": "Tabular Ensemble MLP",
       "augmentations": "None",
-      "description": "Multi-seed neural ensemble with robust cross-channel calibration",
+      "description": "Reference solution using multi-seed neural ensemble on OPSSAT-AD",
       "metrics": {
         "mcc": 0.7385,
         "auc_pr": 0.784,
