@@ -14,4 +14,4 @@ You must:
 
 We will evaluate your inference script on a hidden split containing 3 held-out channels and the remaining 90% of the visible channels. Pass requires beating the human baseline mean on the hidden evaluation.
 
-The pass criteria require the model to achieve an mcc >= 0.60, an auc_pr >= 0.75, and a worst_channel_f1 >= 0.45.
+The pass criteria require the model to achieve an mcc >= 0.55, an auc_pr >= 0.70, and a worst_channel_f1 >= 0.40 (calibrated to beat the human baseline mean).

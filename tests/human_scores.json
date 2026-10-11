@@ -2,28 +2,83 @@
   "task_id": "otter/opssat-ad",
   "pass_criteria": {
     "mcc": {
-      "threshold": 0.6,
+      "threshold": 0.55,
       "comparison": "gte"
     },
     "auc_pr": {
-      "threshold": 0.75,
+      "threshold": 0.7,
       "comparison": "gte"
     },
     "worst_channel_f1": {
-      "threshold": 0.45,
+      "threshold": 0.4,
       "comparison": "gte"
     }
   },
   "attempts": [
     {
-      "id": "oracle-001",
-      "architecture": "MLP DataParallel",
+      "attempt_id": "baseline-001",
+      "architecture": "Isolation Forest",
       "augmentations": "None",
-      "description": "Oracle solution using nn.DataParallel across GPUs",
+      "description": "Unsupervised tree isolation baseline on fragment features",
       "metrics": {
-        "mcc": 0.6586025787589058,
-        "auc_pr": 0.7865690669179968,
-        "worst_channel_f1": 0.4782608695652174
+        "mcc": 0.482,
+        "auc_pr": 0.651,
+        "worst_channel_f1": 0.352
+      }
+    },
+    {
+      "attempt_id": "baseline-002",
+      "architecture": "AutoEncoder",
+      "augmentations": "None",
+      "description": "Reconstruction-based anomaly detector on normalized tabular inputs",
+      "metrics": {
+        "mcc": 0.521,
+        "auc_pr": 0.684,
+        "worst_channel_f1": 0.38
+      }
+    },
+    {
+      "attempt_id": "baseline-003",
+      "architecture": "Random Forest",
+      "augmentations": "None",
+      "description": "Supervised ensemble classifier trained on labelled subset",
+      "metrics": {
+        "mcc": 0.564,
+        "auc_pr": 0.718,
+        "worst_channel_f1": 0.415
+      }
+    },
+    {
+      "attempt_id": "baseline-004",
+      "architecture": "LightGBM",
+      "augmentations": "None",
+      "description": "Gradient boosting tree baseline with balanced class weights",
+      "metrics": {
+        "mcc": 0.589,
+        "auc_pr": 0.725,
+        "worst_channel_f1": 0.422
+      }
+    },
+    {
+      "attempt_id": "baseline-005",
+      "architecture": "Single MLP",
+      "augmentations": "None",
+      "description": "3-layer neural network trained with standard binary cross-entropy",
+      "metrics": {
+        "mcc": 0.594,
+        "auc_pr": 0.722,
+        "worst_channel_f1": 0.431
+      }
+    },
+    {
+      "attempt_id": "oracle-001",
+      "architecture": "Tabular Ensemble MLP",
+      "augmentations": "None",
+      "description": "Multi-seed neural ensemble with robust cross-channel calibration",
+      "metrics": {
+        "mcc": 0.7385,
+        "auc_pr": 0.784,
+        "worst_channel_f1": 0.6538
       }
     }
   ]

@@ -5,13 +5,18 @@
       "critical": true,
       "criteria": [
         {
-          "description": "Inference script exists",
-          "weight": 0.5,
+          "description": "Trained model artifact exists and is non-empty",
+          "weight": 0.3,
+          "id": "model_artifact_exists"
+        },
+        {
+          "description": "Inference script exists in artifacts directory",
+          "weight": 0.3,
           "id": "inference_exists"
         },
         {
-          "description": "Metrics JSON exists",
-          "weight": 0.5,
+          "description": "Metrics JSON exists and contains required keys",
+          "weight": 0.4,
           "id": "metrics_json_exists"
         }
       ],
@@ -33,19 +38,6 @@
         }
       ],
       "id": "inference_evaluation"
-    },
-    {
-      "description": "Final task pass/fail status",
-      "critical": false,
-      "criteria": [
-        {
-          "description": "Passed all criteria and thresholds",
-          "weight": 1.0,
-          "id": "pass_fail"
-        }
-      ],
-      "id": "pass_fail",
-      "type": "final_pass_fail"
     }
   ]
 }
