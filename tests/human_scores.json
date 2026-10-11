@@ -26,6 +26,7 @@
 
   "attempts": [
     {
+      "id": "human_1",
       "attempt_id": "human_1",
       "architecture": "PyTorch MLP",
       "augmentations": "m/z binning and abundance normalization",

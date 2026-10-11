@@ -270,9 +270,8 @@ parser.add_argument("--predictions_output")
 args = parser.parse_args()
 
 model = SimpleMLP(100, 10)
-weights_path = "/app/models/best.pt"
-if not os.path.exists(weights_path):
-    weights_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "models", "best.pt")
+app_dir = os.environ.get("OTTER_APP_DIR", os.path.dirname(os.path.abspath(__file__)))
+weights_path = os.environ.get("OTTER_MODEL_PATH", os.path.join(app_dir, "models", "best.pt"))
 model.load_state_dict(torch.load(weights_path, map_location="cpu", weights_only=True))
 model.eval()
 

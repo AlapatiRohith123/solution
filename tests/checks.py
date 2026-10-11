@@ -29,28 +29,30 @@ from __future__ import annotations
 
 import json
 import os
+import subprocess
 import sys
 import traceback
-import subprocess
-import pandas as pd
-import numpy as np
-from sklearn.metrics import log_loss, average_precision_score
 from pathlib import Path
 from typing import Any
+
+import numpy as np
+import pandas as pd
+from sklearn.metrics import average_precision_score
+
 
 def run_inference_and_evaluate():
     predict_script = app_path("predict.py")
     if not predict_script.exists():
-        predict_script = Path(__file__).parent.parent / "predict.py"
-        
-    hidden_features = Path("/app/tests/data/hidden_test_features.zip")
-    if not hidden_features.exists():
-        hidden_features = Path(__file__).parent / "data" / "hidden_test_features.zip"
-        
-    hidden_labels_path = Path("/app/tests/data/hidden_test_labels.csv")
-    if not hidden_labels_path.exists():
-        hidden_labels_path = Path(__file__).parent / "data" / "hidden_test_labels.csv"
-        
+        predict_script = Path(__file__).resolve().parent.parent / "predict.py"
+
+    tests_dir = Path(__file__).resolve().parent
+    hidden_features = Path(
+        os.environ.get("OTTER_TEST_FEATURES", str(tests_dir / "data" / "hidden_test_features.zip"))
+    )
+    hidden_labels_path = Path(
+        os.environ.get("OTTER_TEST_LABELS", str(tests_dir / "data" / "hidden_test_labels.csv"))
+    )
+
     artifacts_dir = app_path("artifacts")
     artifacts_dir.mkdir(parents=True, exist_ok=True)
     preds_output = artifacts_dir / "predictions.csv"
@@ -181,7 +183,7 @@ def check_metrics_thresholds() -> str:
         assert metrics["macro_ap"] >= 0.0, "macro_ap must be >= 0.0"
         return "inference successful and metrics above baseline"
     except Exception as e:
-        raise AssertionError(f"Inference failed: {e}")
+        raise AssertionError(f"Inference failed: {e}") from e
 
 
 def check_final_deliverables() -> str:
@@ -219,10 +221,10 @@ def _criterion(id: str, fn, milestone_id: str = "final") -> dict[str, Any]:
         }
 
 
-def evaluate(context: dict) -> dict:
+def evaluate(context: dict | None = None) -> dict:
     try:
         metrics = run_inference_and_evaluate()
-    except Exception as e:
+    except Exception:  # noqa: BLE001
         metrics = {
             "sam_testbed_logloss": 1.0,
             "commercial_logloss": 1.0,
