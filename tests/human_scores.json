@@ -14,14 +14,14 @@
   ],
   "pass_criteria": {
     "sam_testbed_logloss": {
-      "threshold": 0.7,
+      "threshold": 0.66,
       "comparison": "lte"
     },
     "commercial_logloss": {
-      "threshold": 0.7,
+      "threshold": 0.65,
       "comparison": "lte"
     },
-    "macro_ap": 0.15
+    "macro_ap": 0.40
   },
 
   "attempts": [
