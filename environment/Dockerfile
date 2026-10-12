@@ -1,4 +1,4 @@
-FROM python:3.12-slim@sha256:a6e34c598f2467ed0e9a8d349809fcd8b5c603269512df273a0bb1784edc11b1
+FROM pytorch/pytorch:2.4.1-cuda12.4-cudnn9-runtime
 
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONHASHSEED=0
