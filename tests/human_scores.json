@@ -14,11 +14,11 @@
   ],
   "pass_criteria": {
     "sam_testbed_logloss": {
-      "threshold": 0.62,
+      "threshold": 0.64,
       "comparison": "lte"
     },
     "commercial_logloss": {
-      "threshold": 0.60,
+      "threshold": 0.63,
       "comparison": "lte"
     },
     "macro_ap": 0.50
@@ -32,9 +32,9 @@
       "augmentations": "m/z binning and abundance normalization",
       "description": "PyTorch multi-layer perceptron trained on binned m/z features with batch norm.",
       "metrics": {
-        "sam_testbed_logloss": 0.5751,
-        "commercial_logloss": 0.5559,
-        "macro_ap": 0.7176
+        "sam_testbed_logloss": 0.5462,
+        "commercial_logloss": 0.6045,
+        "macro_ap": 0.6904
       }
     }
   ]

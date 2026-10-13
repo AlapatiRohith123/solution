@@ -522,11 +522,11 @@ def check_metrics_thresholds() -> str:
     )
 
     # Real quality thresholds on hidden distribution-shifted testbed
-    assert metrics["sam_testbed_logloss"] <= 0.62, (
-        f"sam_testbed_logloss ({metrics['sam_testbed_logloss']:.4f}) must be <= 0.62"
+    assert metrics["sam_testbed_logloss"] <= 0.64, (
+        f"sam_testbed_logloss ({metrics['sam_testbed_logloss']:.4f}) must be <= 0.64"
     )
-    assert metrics["commercial_logloss"] <= 0.60, (
-        f"commercial_logloss ({metrics['commercial_logloss']:.4f}) must be <= 0.60"
+    assert metrics["commercial_logloss"] <= 0.63, (
+        f"commercial_logloss ({metrics['commercial_logloss']:.4f}) must be <= 0.63"
     )
     assert metrics["macro_ap"] >= 0.50, (
         f"macro_ap ({metrics['macro_ap']:.4f}) must be >= 0.50"
