@@ -14,14 +14,14 @@
   ],
   "pass_criteria": {
     "sam_testbed_logloss": {
-      "threshold": 0.66,
+      "threshold": 0.62,
       "comparison": "lte"
     },
     "commercial_logloss": {
-      "threshold": 0.65,
+      "threshold": 0.60,
       "comparison": "lte"
     },
-    "macro_ap": 0.40
+    "macro_ap": 0.50
   },
 
   "attempts": [
@@ -30,11 +30,11 @@
       "attempt_id": "human_1",
       "architecture": "PyTorch MLP",
       "augmentations": "m/z binning and abundance normalization",
-      "description": "Baseline PyTorch MLP model trained on binned m/z features.",
+      "description": "PyTorch multi-layer perceptron trained on binned m/z features with batch norm.",
       "metrics": {
-        "sam_testbed_logloss": 0.6456,
-        "commercial_logloss": 0.5841,
-        "macro_ap": 0.70
+        "sam_testbed_logloss": 0.5751,
+        "commercial_logloss": 0.5559,
+        "macro_ap": 0.7176
       }
     }
   ]

@@ -50,10 +50,10 @@ FINAL_MILESTONE_ID = "final-pass-fail"
 
 _COMPARISONS: dict[str, tuple[str, Any]] = {
     "gte": (">=", lambda actual, threshold: actual >= threshold),
-    "gt":  (">",  lambda actual, threshold: actual > threshold),
+    "gt": (">", lambda actual, threshold: actual > threshold),
     "lte": ("<=", lambda actual, threshold: actual <= threshold),
-    "lt":  ("<",  lambda actual, threshold: actual < threshold),
-    "eq":  ("==", lambda actual, threshold: actual == threshold),
+    "lt": ("<", lambda actual, threshold: actual < threshold),
+    "eq": ("==", lambda actual, threshold: actual == threshold),
 }
 
 
@@ -91,38 +91,44 @@ def evaluate_primary_metrics(
             comparison = "gte"
 
         if comparison not in _COMPARISONS:
-            results.append({
-                "key": key,
-                "passed": False,
-                "threshold": threshold,
-                "comparison": comparison,
-                "error": f"Unknown comparison {comparison!r} for metric "
-                         f"{key!r}. Valid: {sorted(_COMPARISONS)}",
-            })
+            results.append(
+                {
+                    "key": key,
+                    "passed": False,
+                    "threshold": threshold,
+                    "comparison": comparison,
+                    "error": f"Unknown comparison {comparison!r} for metric "
+                    f"{key!r}. Valid: {sorted(_COMPARISONS)}",
+                }
+            )
             continue
 
         symbol, compare_fn = _COMPARISONS[comparison]
 
         if key not in agent_metrics:
-            results.append({
-                "key": key,
-                "passed": False,
-                "threshold": threshold,
-                "comparison": symbol,
-                "error": f"Metric {key!r} not returned by checks.py. "
-                         f"Found: {sorted(agent_metrics)}",
-            })
+            results.append(
+                {
+                    "key": key,
+                    "passed": False,
+                    "threshold": threshold,
+                    "comparison": symbol,
+                    "error": f"Metric {key!r} not returned by checks.py. "
+                    f"Found: {sorted(agent_metrics)}",
+                }
+            )
             continue
 
         actual = float(agent_metrics[key])
         passed = compare_fn(actual, threshold)
-        results.append({
-            "key": key,
-            "passed": passed,
-            "value": actual,
-            "threshold": threshold,
-            "comparison": symbol,
-        })
+        results.append(
+            {
+                "key": key,
+                "passed": passed,
+                "value": actual,
+                "threshold": threshold,
+                "comparison": symbol,
+            }
+        )
 
     return results
 
@@ -265,7 +271,8 @@ def write_outputs(result: dict[str, Any], logs_dir: Path) -> None:
 
 
 def error_result(
-    message: str, paths: EvalPaths | None = None,
+    message: str,
+    paths: EvalPaths | None = None,
 ) -> dict[str, Any]:
     result: dict[str, Any] = {
         "reward": 0.0,
@@ -275,12 +282,14 @@ def error_result(
         "primary_metrics": [],
         "passed": False,
         "error": message,
-        "criteria": [{
-            "id": "verifier_execution",
-            "passed": False,
-            "weight": 1.0,
-            "detail": message,
-        }],
+        "criteria": [
+            {
+                "id": "verifier_execution",
+                "passed": False,
+                "weight": 1.0,
+                "detail": message,
+            }
+        ],
         "metadata": {},
     }
     if paths is not None:
@@ -305,9 +314,7 @@ def main() -> int:
         # A hard failure in rubric_score.py (checks crashed, config
         # mismatch) means the task cannot pass — propagate the error.
         if rubric_result.get("error"):
-            raise RuntimeError(
-                f"rubric_score.py failed: {rubric_result['error']}"
-            )
+            raise RuntimeError(f"rubric_score.py failed: {rubric_result['error']}")
 
         deterministic_criteria = rubric_result.get("criteria", [])
         milestone_meta = rubric_result.get("milestones", [])
@@ -318,15 +325,14 @@ def main() -> int:
         # Load human scores (thresholds for primary metrics).
         human_scores: dict[str, Any] = {}
         if paths.human_scores_path:
-            with Path(paths.human_scores_path).open(
-                "r", encoding="utf-8"
-            ) as fh:
+            with Path(paths.human_scores_path).open("r", encoding="utf-8") as fh:
                 human_scores = json.load(fh)
 
         validate_pass_fail_config(agent_metrics, human_scores)
 
         primary_metric_results = evaluate_primary_metrics(
-            agent_metrics, human_scores,
+            agent_metrics,
+            human_scores,
         )
 
         final_criteria = build_final_milestone_criteria(
@@ -340,15 +346,15 @@ def main() -> int:
         grade = compute_grade(milestone_meta, primary_metric_results)
 
         milestone_scores = dict(rubric_result.get("milestone_scores", {}))
-        milestone_scores[final_milestone_id] = (
-            1.0 if final_milestone_passed else 0.0
-        )
-        milestones = list(milestone_meta) + [{
-            "id": final_milestone_id,
-            "critical": True,
-            "score": 1.0 if final_milestone_passed else 0.0,
-            "passed": final_milestone_passed,
-        }]
+        milestone_scores[final_milestone_id] = 1.0 if final_milestone_passed else 0.0
+        milestones = list(milestone_meta) + [
+            {
+                "id": final_milestone_id,
+                "critical": True,
+                "score": 1.0 if final_milestone_passed else 0.0,
+                "passed": final_milestone_passed,
+            }
+        ]
 
         result = {
             "reward": max(0.0, min(1.0, grade)),
