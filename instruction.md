@@ -15,7 +15,7 @@ The hidden evaluation data features a distribution shift: files are renamed to o
 
 1. **Data Preparation & Proxy Validation Artifacts**:
    - Save your declared proxy-validation split to `/app/artifacts/proxy_val_split.csv` containing columns `sample_id`, `split` (with values `train` and `val`), and `instrument_type` (values `commercial` and `sam_testbed`).
-     - **Constraint**: All `sample_id` values must be drawn from the provided `/app/data/metadata.csv` — do not add synthetic or augmented sample IDs.
+     - **Constraint**: All `sample_id` values must be drawn from the provided `/app/data/metadata.csv` (do not add synthetic or augmented sample IDs).
      - **Distribution Shift**: The split must be strictly group-disjoint (no sample shared between train and val) and must include both `commercial` and `sam_testbed` instruments in both splits (`train` and `val`).
    - Save `/app/artifacts/data_summary.json` summarizing the dataset audit and preprocessing parameters (must include keys `sample_count` matching the total sample count in `metadata.csv`, `feature_dim` e.g. 100, and `instruments_covered` containing `['commercial', 'sam_testbed']`).
 

@@ -121,7 +121,9 @@ def discover_paths() -> EvalPaths:
             else None
         ),
         rubrics_path=(
-            str(rubrics_path) if rubrics_path and rubrics_path.exists() else None
+            str(rubrics_path)
+            if rubrics_path and rubrics_path.exists()
+            else None
         ),
     )
 
@@ -153,7 +155,9 @@ def load_checks_module(tests_dir: Path) -> ModuleType:
 
     spec = importlib.util.spec_from_file_location("checks", module_path)
     if spec is None or spec.loader is None:
-        raise ImportError(f"Could not import verifier module: {module_path}")
+        raise ImportError(
+            f"Could not import verifier module: {module_path}"
+        )
     module = importlib.util.module_from_spec(spec)
     sys.modules["checks"] = module
     spec.loader.exec_module(module)
@@ -212,14 +216,8 @@ def normalize_criterion(
         "weight": weight,
     }
     for key in (
-        "milestone_id",
-        "description",
-        "detail",
-        "actual",
-        "expected",
-        "metric",
-        "threshold",
-        "observed",
+        "milestone_id", "description", "detail",
+        "actual", "expected", "metric", "threshold", "observed",
         "artifact",
     ):
         if key in raw:
@@ -238,8 +236,7 @@ def compute_rubric_score(criteria: list[dict[str, Any]]) -> float:
     if total <= 0:
         return 0.0
     earned = sum(
-        float(c["weight"])
-        for c in criteria
+        float(c["weight"]) for c in criteria
         if (float(c["weight"]) >= 0 and c["passed"])
         or (float(c["weight"]) < 0 and not c["passed"])
     )
@@ -280,14 +277,12 @@ def build_milestone_meta(
     for milestone in milestones:
         mid = str(milestone.get("id", ""))
         score = clamp_score(milestone_scores.get(mid, 0.0))
-        meta.append(
-            {
-                "id": mid,
-                "critical": bool(milestone.get("critical", True)),
-                "score": score,
-                "passed": score == 1.0,
-            }
-        )
+        meta.append({
+            "id": mid,
+            "critical": bool(milestone.get("critical", True)),
+            "score": score,
+            "passed": score == 1.0,
+        })
     return meta
 
 
@@ -371,7 +366,9 @@ def validate_rubric_config(
         )
 
     # Milestone IDs in checks.py but not in rubrics.
-    unknown_milestones = sorted(checks_milestone_ids - rubric_milestone_ids)
+    unknown_milestones = sorted(
+        checks_milestone_ids - rubric_milestone_ids
+    )
     if unknown_milestones:
         errors.append(
             f"Milestone IDs {unknown_milestones} in checks.py not found in "
@@ -382,7 +379,8 @@ def validate_rubric_config(
     if errors:
         raise ValueError(
             "Configuration mismatch between checks.py and "
-            "milestones_and_rubrics.json:\n  - " + "\n  - ".join(errors)
+            "milestones_and_rubrics.json:\n  - "
+            + "\n  - ".join(errors)
         )
 
 
@@ -395,8 +393,7 @@ def write_rubric_result(result: dict[str, Any], logs_dir: Path) -> None:
 
 
 def error_rubric_result(
-    message: str,
-    paths: EvalPaths | None = None,
+    message: str, paths: EvalPaths | None = None,
 ) -> dict[str, Any]:
     result: dict[str, Any] = {
         "rubric_score": 0.0,
@@ -404,14 +401,12 @@ def error_rubric_result(
         "milestones": [],
         "metrics": {},
         "error": message,
-        "criteria": [
-            {
-                "id": "verifier_execution",
-                "passed": False,
-                "weight": 1.0,
-                "detail": message,
-            }
-        ],
+        "criteria": [{
+            "id": "verifier_execution",
+            "passed": False,
+            "weight": 1.0,
+            "detail": message,
+        }],
         "metadata": {},
     }
     if paths is not None:
@@ -452,12 +447,15 @@ def main() -> int:
             raw = {"criteria": module.build_criteria(context)}
         else:
             raise AttributeError(
-                "checks.py must define evaluate(context) or build_criteria(context)"
+                "checks.py must define evaluate(context) or "
+                "build_criteria(context)"
             )
         if isinstance(raw, list):
             raw = {"criteria": raw}
         if not isinstance(raw, dict):
-            raise TypeError("Verifier returned neither a dict nor a list of criteria")
+            raise TypeError(
+                "Verifier returned neither a dict nor a list of criteria"
+            )
 
         raw_criteria = raw.get("criteria", [])
         if not isinstance(raw_criteria, list):
@@ -469,9 +467,7 @@ def main() -> int:
 
         # Validate IDs are consistent across checks.py and the rubrics.
         validate_rubric_config(
-            raw_criteria,
-            deterministic_milestones,
-            final_milestones,
+            raw_criteria, deterministic_milestones, final_milestones,
         )
 
         criteria = [
@@ -485,8 +481,7 @@ def main() -> int:
             "rubric_score": clamp_score(compute_rubric_score(criteria)),
             "milestone_scores": milestone_scores,
             "milestones": build_milestone_meta(
-                deterministic_milestones,
-                milestone_scores,
+                deterministic_milestones, milestone_scores,
             ),
             "metrics": agent_metrics,
             "criteria": criteria,
