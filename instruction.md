@@ -6,17 +6,14 @@ Specifically, you have access to:
 - ~10 labelled SAM-testbed samples.
 - Preprocessed spectra archives with complete instrument metadata.
 
-Your objective is to train a model to accurately detect these compounds across instruments. We will evaluate your solution on a hidden verifier-owned split containing SAM-testbed samples and commercial test samples.
-
-Note on Evaluation Data Shift:
-The hidden evaluation data features a distribution shift: files are renamed to opaque IDs, temperature ramps are resampled, and intensities are scaled by a secret per-instrument factor. Ensure your proxy validation design and modeling approach specifically accounts for this per-instrument shift via intensity normalization and instrument-aware validation.
+Your objective is to train a model to accurately detect these compounds across instruments. The evaluation split contains samples from both instruments (`commercial` and `sam_testbed`). Because spectra vary between commercial laboratory instruments and the SAM testbed, your solution should account for instrument differences and evaluate reliably across both instruments.
 
 ### Required Deliverables
 
 1. **Data Preparation & Proxy Validation Artifacts**:
    - Save your declared proxy-validation split to `/app/artifacts/proxy_val_split.csv` containing columns `sample_id`, `split` (with values `train` and `val`), and `instrument_type` (values `commercial` and `sam_testbed`).
-     - **Constraint**: All `sample_id` values must be drawn from the provided `/app/data/metadata.csv` (do not add synthetic or augmented sample IDs).
-     - **Distribution Shift**: The split must be strictly group-disjoint (no sample shared between train and val) and must include both `commercial` and `sam_testbed` instruments in both splits (`train` and `val`), with at least 4 samples total.
+     - All `sample_id` values must be drawn from the provided `/app/data/metadata.csv` without synthetic or augmented IDs.
+     - The split must be group-disjoint (no sample shared between train and val) and include both `commercial` and `sam_testbed` instruments in each split, covering at least 4 samples in total.
    - Save `/app/artifacts/data_summary.json` summarizing the dataset audit and preprocessing parameters (must include keys `sample_count` matching the integer sample count in `metadata.csv`, `feature_dim` as a positive integer e.g. 100, and `instruments_covered` containing `['commercial', 'sam_testbed']`).
 
 2. **Model Artifact**:
@@ -40,11 +37,7 @@ The hidden evaluation data features a distribution shift: files are renamed to o
    - Write `/app/artifacts/claims.json` where every reported number is traceable to an artifact. It must contain `metrics` (matching values in `metrics.json` within numerical tolerance 1e-3) and a `traceability` object referencing `model_checkpoint` (e.g., `models/best.pt`) and `validation_split` (e.g., `artifacts/proxy_val_split.csv`).
 
 6. **Report**:
-   - Write `/app/artifacts/report.md` (at least 150 words with markdown section headings) discussing:
-     - Approach & model architecture (model type, layer structure, loss function, optimizer, regularization).
-     - Preprocessing & feature extraction (mass spectrometry m/z binning, intensity normalization, temperature profiles).
-     - Instrument distribution shift & proxy validation strategy (commercial vs. SAM testbed shift, group-disjoint validation).
-     - Evaluation results & metrics (log loss and macro average precision discussion).
+   - Write `/app/artifacts/report.md` (at least 150 words with markdown headings). Describe your model architecture and training setup, including layer dimensions, loss function, and optimizer. Outline your mass spectrometry preprocessing pipeline and feature extraction choices. Discuss your proxy validation design for handling differences between commercial and SAM-testbed data, and summarize your evaluation results and metrics.
 
 ### Data Location
 The input data files (`metadata.csv`, `train_labels.csv`, `val_labels.csv`, `train_features.zip`, `val_features.zip`) are provided in `/app/data/`.
