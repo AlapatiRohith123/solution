@@ -26,9 +26,9 @@
       "comparison": "gte"
     }
   },
-
   "attempts": [
     {
+      "id": "human_attempt_1",
       "attempt_id": "human_attempt_1",
       "description": "PyTorch multi-layer perceptron trained on binned m/z features with batch norm and AdamW optimizer.",
       "architecture": "PyTorch MLP (3-layer BatchNorm + Dropout)",
