@@ -150,7 +150,7 @@ def main():
     model = model.to(device)
 
     criterion = nn.BCELoss()
-    optimizer = torch.optim.AdamW(model.parameters(), lr=2e-3, weight_decay=1e-4)
+    optimizer = torch.optim.AdamW(model.parameters(), lr=1e-3, weight_decay=1e-4)
 
     epochs = 40
     for epoch in range(epochs):

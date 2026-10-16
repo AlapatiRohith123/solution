@@ -44,6 +44,6 @@ The input data files (`metadata.csv`, `train_labels.csv`, `val_labels.csv`, `tra
 
 ### Success Criteria
 To successfully pass this task, your model must achieve on the hidden split:
-- `sam_testbed_logloss` <= 0.64
-- `commercial_logloss` <= 0.63
-- `macro_ap` >= 0.50
+- `sam_testbed_logloss` <= 0.58
+- `commercial_logloss` <= 0.61
+- `macro_ap` >= 0.68
