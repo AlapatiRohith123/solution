@@ -120,30 +120,38 @@ def main():
     y_train = train_labels.drop(columns=["sample_id"]).values
     y_val = val_labels.drop(columns=["sample_id"]).values
 
-    # Train calibrated multi-output Random Forest ensemble
-    models = {}
+    # Train validation model on train split to generate validation metrics
     val_preds = np.zeros_like(y_val, dtype=float)
-
     for i, c in enumerate(TARGET_CLASSES):
         y_c = y_train[:, i]
         if len(np.unique(y_c)) > 1:
             clf = RandomForestClassifier(n_estimators=100, max_depth=10, random_state=42)
             clf.fit(X_train, y_c)
-            models[c] = clf
             probs = clf.predict_proba(X_val)[:, 1]
             val_preds[:, i] = np.clip(probs, 0.01, 0.99)
         else:
-            const_val = float(np.mean(y_c))
-            models[c] = const_val
-            val_preds[:, i] = np.full(len(X_val), const_val)
+            val_preds[:, i] = np.full(len(X_val), float(np.mean(y_c)))
+
+    # Fit final deployable ensemble across all available training data (train + val)
+    X_all = np.vstack([X_train, X_val])
+    y_all = np.vstack([y_train, y_val])
+    final_models = {}
+    for i, c in enumerate(TARGET_CLASSES):
+        y_c = y_all[:, i]
+        if len(np.unique(y_c)) > 1:
+            clf = RandomForestClassifier(n_estimators=100, max_depth=10, random_state=42)
+            clf.fit(X_all, y_c)
+            final_models[c] = clf
+        else:
+            final_models[c] = float(np.mean(y_c))
 
     app_dir = get_app_dir()
     models_dir = os.path.join(app_dir, "models")
     os.makedirs(models_dir, exist_ok=True)
     best_model_path = os.path.join(models_dir, "best.joblib")
-    joblib.dump(models, best_model_path)
+    joblib.dump(final_models, best_model_path)
     # Also save as best.pt using joblib for dual resolution
-    joblib.dump(models, os.path.join(models_dir, "best.pt"))
+    joblib.dump(final_models, os.path.join(models_dir, "best.pt"))
 
     # Separate metrics by instrument in val set
     val_meta = metadata[metadata["split"] == "val"].set_index("sample_id")
