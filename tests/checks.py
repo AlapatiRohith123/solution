@@ -239,7 +239,7 @@ def check_data_schema() -> str:
         {"sample_id", "split", "instrument_type"},
         "proxy_val_split.csv",
     )
-    assert len(df) >= 4, f"Proxy validation split has too few samples ({len(df)} < 4)"
+    assert len(df) >= 6, f"Proxy validation split has too few samples ({len(df)} < 6)"
 
     # Check valid split values
     splits = set(df["split"].unique())

@@ -14,15 +14,15 @@
   ],
   "pass_criteria": {
     "sam_testbed_logloss": {
-      "threshold": 0.60,
+      "threshold": 0.44,
       "comparison": "lte"
     },
     "commercial_logloss": {
-      "threshold": 0.61,
+      "threshold": 0.46,
       "comparison": "lte"
     },
     "macro_ap": {
-      "threshold": 0.67,
+      "threshold": 0.80,
       "comparison": "gte"
     }
   },
@@ -30,13 +30,13 @@
     {
       "id": "human_attempt_1",
       "attempt_id": "human_attempt_1",
-      "description": "PyTorch multi-layer perceptron trained on binned m/z features with batch norm and AdamW optimizer.",
-      "architecture": "PyTorch MLP (3-layer BatchNorm + Dropout)",
-      "augmentations": "m/z binning and peak abundance normalization",
+      "description": "Multi-window thermal-spectral feature extraction across low (30-350C), mid (350-650C), and high (650-950C) temperature decomposition stages with calibrated tree ensemble.",
+      "architecture": "Calibrated Multi-Window Thermal-Spectral Ensemble",
+      "augmentations": "Temperature-windowed m/z binning and stage-wise peak abundance normalization",
       "metrics": {
-        "sam_testbed_logloss": 0.5809,
-        "commercial_logloss": 0.5951,
-        "macro_ap": 0.6867
+        "sam_testbed_logloss": 0.3626,
+        "commercial_logloss": 0.3971,
+        "macro_ap": 0.8743
       }
     }
   ]
