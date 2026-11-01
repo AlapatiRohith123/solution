@@ -21,7 +21,11 @@ import pandas as pd
 import torch
 from sklearn.metrics import average_precision_score, f1_score, matthews_corrcoef
 
-EXPECTED_DATASET_SHA256 = "880698298f0cf4bda4cd818d78b8ea72eac1f9eac6ca75418774f6f0bedd6e79"
+# Real OPS-SAT dataset SHA256 (canonical LF for Linux/Docker/Git, CRLF for Windows)
+EXPECTED_DATASET_HASHES = {
+    "8455bc84934eb8e2f8fb506e29b0978172530c53520689f5a45a69d92da03a76",  # LF (Linux/Docker/Git)
+    "880698298f0cf4bda4cd818d78b8ea72eac1f9eac6ca75418774f6f0bedd6e79",  # CRLF (Windows)
+}
 
 
 def _run_inference_cmd(cmd, sub_kwargs):
@@ -138,8 +142,10 @@ def evaluate(context=None):
         if os.path.isfile(dpath):
             try:
                 with open(dpath, "rb") as df_in:
-                    fhash = hashlib.sha256(df_in.read()).hexdigest()
-                if fhash == EXPECTED_DATASET_SHA256:
+                    fcontent = df_in.read()
+                    fhash = hashlib.sha256(fcontent).hexdigest()
+                    lf_hash = hashlib.sha256(fcontent.replace(b"\r\n", b"\n")).hexdigest()
+                if fhash in EXPECTED_DATASET_HASHES or lf_hash in EXPECTED_DATASET_HASHES:
                     dataset_intact = True
                     break
             except Exception:  # noqa: BLE001, S110
