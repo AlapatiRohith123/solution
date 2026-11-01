@@ -40,10 +40,15 @@ def _run_inference_cmd(cmd, sub_kwargs):
         try:
             c = list(cmd)
             c[0] = interp
-            subprocess.run(c, check=True, capture_output=True, **sub_kwargs)
+            subprocess.run(c, check=True, capture_output=True, text=True, **sub_kwargs)
             return True
-        except Exception:  # noqa: BLE001, S110
-            pass
+        except Exception as e:  # noqa: BLE001
+            if hasattr(e, "stderr") and e.stderr:
+                print(f"[verifier] inference failed with {interp}: {e.stderr}", file=sys.stderr)
+            elif hasattr(e, "output") and e.output:
+                print(f"[verifier] inference failed with {interp}: {e.output}", file=sys.stderr)
+            else:
+                print(f"[verifier] inference failed with {interp}: {e}", file=sys.stderr)
 
     return False
 
@@ -239,8 +244,9 @@ def evaluate(context=None):
                 except OSError:
                     pass
 
-    # Secure artifacts directory permissions
+    # Secure app and artifacts directory permissions
     try:
+        os.chmod(app_dir, 0o755)
         os.chmod(artifacts_dir, 0o755)
         for fname in os.listdir(artifacts_dir):
             fpath = os.path.join(artifacts_dir, fname)
@@ -260,10 +266,20 @@ def evaluate(context=None):
     except OSError:
         pass
 
+    # Prepare unprivileged home directory so torch/cuda can cache without permission issues
+    nobody_home = "/tmp/nobody_home"
+    os.makedirs(nobody_home, mode=0o777, exist_ok=True)
+    try:
+        os.chmod(nobody_home, 0o777)
+    except OSError:
+        pass
+
     env = os.environ.copy()
     env["PYTHONHASHSEED"] = "42"
     env["CUDA_LAUNCH_BLOCKING"] = "1"
-    env["HOME"] = os.environ.get("HOME", "/tmp")
+    env["HOME"] = nobody_home
+    env["TORCH_HOME"] = nobody_home
+    env["CUDA_CACHE_PATH"] = os.path.join(nobody_home, ".nv")
     env.pop("PYTHONPATH", None)
     env["PYTHONPATH"] = ""
 
@@ -308,9 +324,10 @@ def evaluate(context=None):
             if os.path.exists(target_holdout_dst):
                 import shutil
                 shutil.rmtree(target_holdout_dst, ignore_errors=True)
-            os.rename(tests_data_dir, target_holdout_dst)
+            import shutil
+            shutil.move(tests_data_dir, target_holdout_dst)
             holdout_moved = True
-        except OSError:
+        except Exception:  # noqa: BLE001, S110
             pass
 
     try:
@@ -444,8 +461,11 @@ def evaluate(context=None):
             try:
                 target_holdout_src = os.path.join(secure_holdout_dir, "holdout_data")
                 if os.path.exists(target_holdout_src):
-                    os.rename(target_holdout_src, tests_data_dir)
-            except OSError:
+                    import shutil
+                    if os.path.exists(tests_data_dir):
+                        shutil.rmtree(tests_data_dir, ignore_errors=True)
+                    shutil.move(target_holdout_src, tests_data_dir)
+            except Exception:  # noqa: BLE001, S110
                 pass
 
 
