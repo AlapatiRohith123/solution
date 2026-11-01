@@ -5,6 +5,7 @@ import os
 import random
 import subprocess
 import sys
+import tempfile
 
 # Grader isolation: Strip /app, current working directory, and PYTHONPATH entries from sys.path
 # to prevent any agent files from hijacking imports or verifier scoring.
@@ -273,7 +274,7 @@ def evaluate(context=None):
         pass
 
     # Prepare unprivileged home directory so torch/cuda can cache without permission issues
-    nobody_home = "/tmp/nobody_home"
+    nobody_home = os.environ.get("NOBODY_HOME", os.path.join(tempfile.gettempdir(), "nobody_home"))
     os.makedirs(nobody_home, mode=0o777, exist_ok=True)
     try:
         os.chmod(nobody_home, 0o777)
@@ -319,9 +320,12 @@ def evaluate(context=None):
             pass
 
     # Physical hiding of holdout data during inference:
-    # Temporarily move holdout_data to /root/.secure_holdout so it cannot be read
+    # Temporarily move holdout_data so it cannot be read
     # by unprivileged processes even if path probing is attempted.
-    secure_holdout_dir = "/root/.secure_holdout"
+    secure_holdout_dir = os.environ.get(
+        "SECURE_HOLDOUT_DIR",
+        os.path.join(os.environ.get("HOME", tempfile.gettempdir()), ".secure_holdout"),
+    )
     holdout_moved = False
     if os.name != "nt" and os.path.exists(tests_data_dir):
         try:
