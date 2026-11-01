@@ -1,17 +1,18 @@
-Build an end-to-end tabular ML system for CubeSat Telemetry Fragment Anomaly Detection on the OPSSAT-AD dataset. 
+Build an end-to-end deep learning system in PyTorch for CubeSat Multi-Channel Telemetry Stream Anomaly Detection under channel distribution shift using real flight telemetry from the European Space Agency (ESA) OPS-SAT spacecraft (OPSSAT-AD).
 
-You are provided with tabular telemetry fragments in `/app/task_inputs/dataset.csv`.
-- The dataset contains features derived from univariate fragments.
-- It includes data from 6 channels.
-- Only ~10% of the fragments are labelled (where `anomaly` is 0 or 1). The rest are unlabelled (`anomaly` is -1).
-- The goal is to detect anomalous fragments (binary classification).
+You are provided with telemetry segments in `/app/task_inputs/dataset.csv`.
+- The dataset contains 1,740 telemetry segments derived from real OPS-SAT on-orbit flight telemetry, each consisting of 128 normalized sequential readings (`seq_000` through `seq_127`).
+- It includes data from 6 visible satellite telemetry channels (`channel_01` to `channel_06`) across EPS, ADCS, TCS, and COMMS subsystems.
+- Approximately 20% of the segments are labelled (where `anomaly` is 0 or 1). The rest are unlabelled (`anomaly` is -1).
+- The goal is to detect anomalous segments (binary classification).
+- External data, external pretrained weights, and label lookups from public sources are strictly prohibited. You must train exclusively on `/app/task_inputs/dataset.csv`. The integrity of `/app/task_inputs/dataset.csv` is strictly verified by the verifier (SHA256 checksum must match the original dataset). Furthermore, saving external label lookup tables, downloaded datasets, or pre-computed predictions in `/app` is prohibited. Model inference will be validated on input sensitivity probes to confirm that predictions respond dynamically to sequential telemetry patterns.
 
 You must:
-1. Train a model capable of detecting anomalies, robust to distribution shifts (new channels).
-2. Save your trained model artifact(s) to `/app/artifacts/`.
-3. Create an inference script `/app/artifacts/inference.py` that takes an input CSV path and an output CSV path as arguments (`python /app/artifacts/inference.py --input <input_csv> --output <output_csv>`). It should load your model and write predictions (with columns `segment` and `prediction`, where prediction is probability or binary label) to the output CSV.
-4. Generate evaluation metrics on your internal validation set and save them to `/app/artifacts/metrics.json`. Your JSON should have keys: `mcc`, `auc_pr`, and `worst_channel_f1`.
+1. Train a deep neural network in PyTorch (such as a 1D Dilated Residual Convolutional Network, Temporal Transformer, or Multi-Scale Sequence Network) capable of detecting anomalies across telemetry segments, utilizing GPU acceleration (`cuda`).
+2. Save your trained PyTorch model artifact(s) to `/app/artifacts/`. Model artifact file(s) must be at least 1024 bytes (1 KB) in size, use a PyTorch model serialization extension (`.pth`, `.pt`, or `.bin`), and contain a serialized PyTorch neural network model or state dict with floating-point tensor parameters. Non-PyTorch formats (such as scikit-learn, XGBoost, or LightGBM artifacts) are strictly not permitted.
+3. Create an inference script `/app/artifacts/inference.py` that takes an input CSV path and an output CSV path as arguments (`python /app/artifacts/inference.py --input <input_csv> --output <output_csv>`). It should load your PyTorch model and write predictions to the output CSV with columns `segment` and `prediction`, where `prediction` contains continuous anomaly probability scores bounded in [0, 1]. The script must utilize GPU acceleration (`cuda`) for model inference. The evaluation binarizes predictions at a threshold of 0.5 (`prediction > 0.5`) to compute Matthews Correlation Coefficient (MCC) and per-channel F1 scores, while AUC-PR is evaluated directly on continuous predicted probabilities. You must provide exactly one prediction row for every segment in the input CSV (no duplicate, missing, or unknown segment IDs).
+4. Generate evaluation metrics on your internal validation set (held out from training) and save them to `/app/artifacts/metrics.json`. Your JSON should have keys: `mcc`, `auc_pr`, and `worst_channel_f1` (where `worst_channel_f1` reports the minimum F1 across evaluated validation channels). Values must be non-fabricated numbers reflecting realistic cross-validation results (`mcc <= 0.98`, `auc_pr <= 0.995`, `worst_channel_f1 <= 0.98`, and `worst_channel_f1 <= auc_pr + 0.15`).
 
-We will evaluate your inference script on a hidden split containing 3 held-out channels and the remaining 90% of the visible channels. Pass requires beating the human baseline mean on the hidden evaluation.
+We will evaluate your inference script on a hidden evaluation set containing held-out telemetry channels (`channel_07`, `channel_08`, `channel_09`) and held-out segments from visible channels. Pass requires meeting all performance criteria on the hidden evaluation.
 
-The pass criteria require the model to achieve an mcc >= 0.55, an auc_pr >= 0.70, and a worst_channel_f1 >= 0.40 (calibrated to beat the human baseline mean).
+The pass criteria require the model to achieve an mcc >= 0.78, an auc_pr >= 0.88, and a worst_channel_f1 >= 0.55 (where worst_channel_f1 is evaluated over channels with at least 20 segments and at least 5 anomalies to prevent statistical noise on tiny channels).

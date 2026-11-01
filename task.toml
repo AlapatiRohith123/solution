@@ -3,19 +3,19 @@ runtime_limits = 14400
 
 [task]
 name = "otter/opssat-ad"
-description = "CubeSat Telemetry Fragment Anomaly Detection With 10% Labels on Held-Out Channels (OPS-SAT-AD)"
+description = "CubeSat Multi-Channel Telemetry Stream Anomaly Detection on Real ESA OPS-SAT Data With Semi-Supervised Labels (OPSSAT-AD)"
 
 [metadata]
 domain = "tabular-ml"
 subdomain = "anomaly-detection"
-tags = ["anomaly-detection", "tabular", "space", "ops-sat", "distribution-shift"]
+tags = ["anomaly-detection", "time-series", "deep-learning", "pytorch", "cubesat", "distribution-shift"]
 source_dataset = "OPSSAT-AD"
 source_url = "https://zenodo.org/records/12588359"
 source_reference_id = "10.5281/zenodo.12588359"
 source_license = "CC BY 4.0"
 
 [environment]
-build_timeout_sec = 1200.0
+build_timeout_sec = 2400.0
 workdir = "/app"
 os = "linux"
 cpus = 4

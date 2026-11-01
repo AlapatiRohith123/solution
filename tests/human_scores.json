@@ -2,15 +2,15 @@
   "task_id": "otter/opssat-ad",
   "pass_criteria": {
     "mcc": {
-      "threshold": 0.55,
+      "threshold": 0.78,
       "comparison": "gte"
     },
     "auc_pr": {
-      "threshold": 0.7,
+      "threshold": 0.88,
       "comparison": "gte"
     },
     "worst_channel_f1": {
-      "threshold": 0.4,
+      "threshold": 0.55,
       "comparison": "gte"
     }
   },
@@ -18,13 +18,13 @@
     {
       "id": "oracle-001",
       "attempt_id": "oracle-001",
-      "architecture": "Tabular Ensemble MLP",
-      "augmentations": "None",
-      "description": "Reference solution using multi-seed neural ensemble on OPSSAT-AD",
+      "architecture": "PyTorch Deep Telemetry Transformer-ResNet on NVIDIA GPU",
+      "augmentations": "Stratified 3-fold cross-validation with temporal jitter, time-masking, and out-of-fold logit calibration (seed 42, NVIDIA GPU)",
+      "description": "Reference deep learning solution using PyTorch Dilated 1D ResNet with Multi-Head Self-Attention trained with GPU acceleration on real ESA OPS-SAT telemetry",
       "metrics": {
-        "mcc": 0.7385,
-        "auc_pr": 0.784,
-        "worst_channel_f1": 0.6538
+        "mcc": 0.8808,
+        "auc_pr": 0.9663,
+        "worst_channel_f1": 0.5818
       }
     }
   ]
