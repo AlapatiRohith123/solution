@@ -15,4 +15,4 @@ You must:
 
 We will evaluate your inference script on a hidden evaluation set containing held-out telemetry channels (`channel_07`, `channel_08`, `channel_09`) and held-out segments from visible channels. Pass requires meeting all performance criteria on the hidden evaluation.
 
-The pass criteria require the model to achieve an mcc >= 0.78, an auc_pr >= 0.88, and a worst_channel_f1 >= 0.55 (where worst_channel_f1 is evaluated over channels with at least 20 segments and at least 5 anomalies to prevent statistical noise on tiny channels).
+The pass criteria require the model to achieve an mcc >= 0.80, an auc_pr >= 0.90, and a worst_channel_f1 >= 0.55 (where worst_channel_f1 is evaluated over channels with at least 20 segments and at least 5 anomalies to prevent statistical noise on tiny channels).
