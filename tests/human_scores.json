@@ -22,8 +22,8 @@
       "augmentations": "Stratified 3-fold cross-validation with temporal jitter, time-masking, and out-of-fold logit calibration (seed 42, NVIDIA GPU)",
       "description": "Reference deep learning solution using PyTorch Dilated 1D ResNet with Multi-Head Self-Attention trained with GPU acceleration on real ESA OPS-SAT telemetry",
       "metrics": {
-        "mcc": 0.8808,
-        "auc_pr": 0.9663,
+        "mcc": 0.8733,
+        "auc_pr": 0.9655,
         "worst_channel_f1": 0.5818
       }
     }
